@@ -1,81 +1,84 @@
-library("rTensor")
-library("openssl")
-
-load("faces_tnsr.RData")
-source("DelayedTensor_Arithmetic.R")
-source("DelayedTensor_Class.R")
-source("DelayedTensor_Decomp.R")
-source("DelayedTensor_Misc.R")
-
-set.seed(1234)
-tnsr <- rTensor::rand_tensor()
-set.seed(1234)
-dtnsr <- rand_tensor()
-
-
 context("### 21. unfold ###\n")
 expect_identical(
     rTensor::unfold(tnsr, row_idx=1, col_idx=c(2, 3))@data,
+    as.matrix(tensorr::unfold(stnsr, 1)@mat),
     unfold(dtnsr, row_idx=1, col_idx=c(2, 3))@data)
 
+# tensorrのunfoldにはcol_idxオプションがない
+# 転置関数t()を作って、どこかのオーダー間だけ入れ替えられればいらないが...
 expect_identical(
     rTensor::unfold(tnsr, row_idx=2, col_idx=c(3, 1))@data,
     unfold(dtnsr, row_idx=2, col_idx=c(3, 1))@data)
 
 expect_identical(
     rTensor::unfold(tnsr, row_idx=3, col_idx=c(1, 2))@data,
+    as.matrix(tensorr::unfold(stnsr, 3)@mat),
     unfold(dtnsr, row_idx=3, col_idx=c(1, 2))@data)
 
 
 context("### 22. k_unfold ###\n")
+# これがtensorrのunfoldに相当
 expect_identical(
     rTensor::k_unfold(tnsr, m=1)@data,
+    as.matrix(tensorr::unfold(stnsr, m=1)@mat),
     k_unfold(dtnsr, m=1)@data)
 
 expect_identical(
     rTensor::k_unfold(tnsr, m=2)@data,
+    as.matrix(tensorr::unfold(stnsr, m=2)@mat),
     k_unfold(dtnsr, m=2)@data)
 
 expect_identical(
     rTensor::k_unfold(tnsr, m=3)@data,
+    as.matrix(tensorr::unfold(stnsr, m=3)@mat),
     k_unfold(dtnsr, m=3)@data)
 
 
 context("### 23. matvec ###\n")
 expect_identical(
     rTensor::matvec(tnsr)@data,
+    t(as.matrix(tensorr::unfold(stnsr, m=2)@mat)),
     matvec(dtnsr)@data)
 
 
 context("### 24. rs_unfold ###\n")
+# unfoldした後、横長行列で返す（Short-and-fat）
 expect_identical(
     rTensor::rs_unfold(tnsr, m=1)@data,
+    as.matrix(tensorr::unfold(stnsr, m=1)@mat),
     rs_unfold(dtnsr, m=1)@data)
 
 expect_identical(
     rTensor::rs_unfold(tnsr, m=2)@data,
+    as.matrix(tensorr::unfold(stnsr, m=2)@mat),
     rs_unfold(dtnsr, m=2)@data)
 
 expect_identical(
     rTensor::rs_unfold(tnsr, m=3)@data,
+    as.matrix(tensorr::unfold(stnsr, m=3)@mat),
     rs_unfold(dtnsr, m=3)@data)
 
 
 context("### 25. cs_unfold ###\n")
+# unfoldした後、縦長行列で返す（Tall-and-skinny）
 expect_identical(
     rTensor::cs_unfold(tnsr, m=1)@data,
+    t(as.matrix(tensorr::unfold(stnsr, m=1)@mat)),
     cs_unfold(dtnsr, m=1)@data)
 
 expect_identical(
     rTensor::cs_unfold(tnsr, m=2)@data,
+    t(as.matrix(tensorr::unfold(stnsr, m=2)@mat)),
     cs_unfold(dtnsr, m=2)@data)
 
 expect_identical(
     rTensor::cs_unfold(tnsr, m=3)@data,
+    t(as.matrix(tensorr::unfold(stnsr, m=3)@mat)),
     cs_unfold(dtnsr, m=3)@data)
 
 
 context("### 26. modeSum ###\n")
+# tensorrには実装がない
 expect_identical(
     rTensor::modeSum(tnsr, m=1, drop=FALSE)@data,
     modeSum(dtnsr, m=1, drop=FALSE)@data)
@@ -102,6 +105,7 @@ expect_identical(
 
 
 context("### 27. modeMean ###\n")
+# tensorrには実装がない
 expect_identical(
     rTensor::modeMean(tnsr, m=1, drop=FALSE)@data,
     modeMean(dtnsr, m=1, drop=FALSE)@data)
@@ -130,36 +134,44 @@ expect_identical(
 context("### 28. fnorm ###\n")
 expect_identical(
     rTensor::fnorm(tnsr),
+    tensorr::norm(stnsr),
     fnorm(dtnsr))
 
 
 context("### 29. innerProd ###\n")
 expect_identical(
     rTensor::innerProd(tnsr, tnsr),
+    tensorr::innerprod(stnsr, stnsr),
     innerProd(dtnsr, dtnsr))
 
 
 context("### 30. initialize ###\n")
 expect_identical(
     tnsr@num_modes,
+    length(stnsr@dims),
     dtnsr@num_modes)
 
 expect_identical(
     tnsr@modes,
+    stnsr@dims,
     dtnsr@modes)
 
 expect_identical(
     tnsr@data,
+    .sp_to_array(stnsr),
     dtnsr@data)
 
 
 context("### 31. dim ###\n")
+# tensorrでは実装がない
 expect_identical(
     dim(tnsr),
+    stnsr@dims,
     dim(dtnsr))
 
 expect_identical(
     dim(tnsr@data),
+    dim(.sp_to_array(stnsr)),
     dim(dtnsr@data))
 
 
@@ -261,46 +273,57 @@ expect_identical(
 
 context("### 36. [ ###\n")
 expect_identical(
-    tnsr[1,2,3]@data,
-    dtnsr[1,2,3]@data)
+    tnsr@data[1,2,3],
+    stnsr[1,2,3],
+    dtnsr@data[1,2,3])
 
 expect_identical(
-    tnsr[3,1,]@data,
-    dtnsr[3,1,]@data)
+    tnsr@data[3,1,],
+    .sp_to_array(stnsr[3,1,]),
+    dtnsr@data[3,1,])
 
 expect_identical(
-    tnsr[,,5]@data,
-    dtnsr[,,5]@data)
+    tnsr@data[,,5],
+    .sp_to_array(stnsr[,,5])[,,1], # tensorr的drop=FALSEの動作
+    dtnsr@data[,,5])
 
 expect_identical(
-    tnsr[,,5,drop=FALSE]@data,
-    dtnsr[,,5,drop=FALSE]@data)
+    tnsr[,,5, drop=FALSE]@data,
+    .sp_to_array(stnsr[,,5]),
+    dtnsr[,,5, drop=FALSE]@data)
 
 
 context("### 37. [<- ###\n")
 tnsr[1,2,3] <- 3
+stnsr[1,2,3] <- 3
 dtnsr[1,2,3] <- 3
 
 expect_identical(
-    tnsr[1,2,3]@data,
-    dtnsr[1,2,3]@data)
+    tnsr@data[1,2,3],
+    stnsr[1,2,3],
+    dtnsr@data[1,2,3])
 
 tnsr[3,1,] <- rep(0,5)
+stnsr[3,1,] <- rep(0,5)
 dtnsr[3,1,] <- rep(0,5)
 
 expect_identical(
-    tnsr[3,1,]@data,
-    dtnsr[3,1,]@data)
+    tnsr@data[3,1,],
+    .sp_to_array(stnsr[3,1,]),
+    dtnsr@data[3,1,])
 
 tnsr[,2,] <-  matrix(0,nrow=3,ncol=5)
+stnsr[,2,] <-  matrix(0,nrow=3,ncol=5)
 dtnsr[,2,] <-  matrix(0,nrow=3,ncol=5)
 
 expect_identical(
-    tnsr[,2,]@data,
-    dtnsr[,2,]@data)
+    tnsr@data[,2,],
+    .sp_to_array(stnsr[,2,])[,1,],
+    dtnsr@data[,2,])
 
 
 context("### 38. t ###\n")
+# tensorrにはない
 expect_identical(
 	rTensor::t(tnsr)@data[,,1],
 	rTensor::t(tnsr@data[,,1]))
@@ -313,6 +336,8 @@ expect_identical(
 	rTensor::t(rTensor::t(tnsr)),
 	tnsr)
 
+
+
 expect_identical(
 	t(dtnsr)@data[,,1],
 	t(dtnsr@data[,,1]))
@@ -324,6 +349,8 @@ expect_identical(
 expect_identical(
 	t(t(dtnsr)),
 	dtnsr)
+
+
 
 expect_identical(
 	rTensor::t(tnsr)@data[,,1],
@@ -342,11 +369,13 @@ context("### 39. as.delayed.matrix ###\n")
 #From matrix
 mat <- matrix(runif(1000), nrow=100, ncol=10)
 matT <- rTensor::as.tensor(mat)
-matT <- as.delayed.matrix(mat)
+smatT <- tensorr::as_sptensor(tensorr::as_dtensor(mat))
+dmatT <- as.delayed.matrix(mat)
 
 expect_identical(
 	mat,
 	matT@data,
+    .sp_to_array(smatT),
 	dmatT@data)
 
 
@@ -355,47 +384,41 @@ context("### 40. as.delayed.tensor ###\n")
 set.seed(1234)
 vec <- runif(100)
 vecT <- rTensor::as.tensor(vec)
+svecT <- tensorr::as_sptensor(tensorr::as_dtensor(as.matrix(vec)))
 dvecT <- as.delayed.tensor(vec)
 
 expect_identical(
 	vec,
 	as.vector(vecT@data),
+    as.vector(smatT),
 	as.vector(dvecT@data))
-
-#From matrix
-mat <- matrix(runif(1000), nrow=100, ncol=10)
-matT <- rTensor::as.tensor(mat)
-dmatT <- as.delayed.tensor(mat)
-
-expect_identical(
-	mat,
-	matT@data,
-	dmatT@data)
 
 #From array
 indices <- c(10,20,30,40)
 arr <- array(runif(prod(indices)), dim = indices)
 arrT <- rTensor::as.tensor(arr)
+sarrT <- tensorr::as_sptensor(tensorr::as_dtensor(arr))
 darrT <- as.delayed.tensor(arr)
 
 expect_identical(
 	arr,
 	arrT@data,
+    .sp_to_array(sarrT),
 	darrT@data)
 
 
 context("### 41. as.tensor ###\n")
-# indices <- c(10,20,30,40)
-# arr <- array(runif(prod(indices)), dim = indices)
-# arrT <- rTensor::as.tensor(arr)
 # darrT <- as.tensor(as.delayed.tensor(arr))
 
 # expect_identical(
-# 	arrT,
-# 	darrT)
+#     arr,
+#     arrT@data,
+#     .sp_to_array(sarrT),
+#     darrT@data)
 
 
 context("### 42. tperm ###\n")
+# tensorrには無い
 A <- rTensor::tperm(tnsr, perm=c(2,1,3))
 B <- tperm(dtnsr, perm=c(2,1,3))
 
@@ -414,8 +437,10 @@ expect_identical(
 context("### 43. vec / as.delayed.vector ###\n")
 expect_identical(
 	rTensor::vec(tnsr),
+    as.vector(stnsr),
 	vec(dtnsr))
 
 expect_identical(
 	rTensor::vec(tnsr),
+    as.vector(stnsr),
 	as.delayed.vector(dtnsr))

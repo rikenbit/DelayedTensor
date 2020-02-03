@@ -59,7 +59,7 @@ cp <- function(tnsr, num_components=NULL,max_iter=25, tol=1e-5){
 	pb <- txtProgressBar(min=0,max=max_iter,style=3)
 	#main loop (until convergence or max_iter)
 	norm_vec <- function(vec){
-	norm(as.matrix(vec))
+	    base::norm(as.matrix(vec))
 	}
 	while((curr_iter < max_iter) && (!converged)){
 	setTxtProgressBar(pb,curr_iter)

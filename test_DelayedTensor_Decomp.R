@@ -1,16 +1,4 @@
-library("rTensor")
-
-load("faces_tnsr.RData")
-source("DelayedTensor_Arithmetic.R")
-source("DelayedTensor_Class.R")
-source("DelayedTensor_Decomp.R")
-source("DelayedTensor_Misc.R")
-
-set.seed(1234)
-tnsr <- rTensor::rand_tensor(c(6,7,8))
-set.seed(1234)
-dtnsr <- rand_tensor(c(6,7,8))
-
+# tensorrではアルゴリズムは一切実装していない
 
 context("### 44. hosvd ###\n")
 hosvdD <- rTensor::hosvd(tnsr)
@@ -118,10 +106,28 @@ expect_identical(
 
 
 context("### 47. mpca ###\n")
+subject <- faces_tnsr[,,8,]
+dsubject <- subject
+class(dsubject) <- "DelayedTensor"
+
+options(warn=-1)
 set.seed(1234)
-mpcaD <- rTensor::mpca(tnsr, ranks=c(3,4))
+mpcaD <- rTensor::mpca(subject, ranks=c(10,10))
+
 set.seed(1234)
-dmpcaD <- mpca(dtnsr, ranks=c(3,4))
+dmpcaD <- mpca(dsubject, ranks=c(10,10))
+
+options(warn=1)
+
+expect_identical(
+    mpcaD$conv,
+    dmpcaD$conv
+)
+
+expect_identical(
+    mpcaD$norm_percent,
+    dmpcaD$norm_percent
+)
 
 expect_identical(
     mpcaD$all_resids,
@@ -131,38 +137,39 @@ expect_identical(
 
 context("### 48. pvd ###\n")
 set.seed(1234)
-pvdD <- rTensor::pvd(tnsr, uranks=rep(3,8), wranks=rep(7,8), a=3, b=7)
+pvdD <- rTensor::pvd(subject, uranks=rep(46,10), wranks=rep(56,10), a=46, b=56)
+
 set.seed(1234)
-dpvdD <- pvd(dtnsr, uranks=rep(3,8), wranks=rep(7,8), a=3, b=7)
+dpvdD <- pvd(dsubject, uranks=rep(46,10), wranks=rep(56,10), a=46, b=56)
 
 expect_identical(
-    mpcaD$P,
-    dmpcaD$P
+    pvdD$P,
+    dpvdD$P
 )
 
 expect_identical(
-    mpcaD$D,
-    dmpcaD$D
+    pvdD$D,
+    dpvdD$D
 )
 
 expect_identical(
-    mpcaD$V,
-    dmpcaD$V
+    pvdD$V,
+    dpvdD$V
 )
 
 expect_identical(
-    mpcaD$est@data,
-    dmpcaD$est@data
+    pvdD$est@data,
+    dpvdD$est@data
 )
 
 expect_identical(
-    mpcaD$norm_percent,
-    dmpcaD$norm_percent
+    pvdD$norm_percent,
+    dpvdD$norm_percent
 )
 
 expect_identical(
-    mpcaD$fnorm_resid,
-    dmpcaD$fnorm_resid
+    pvdD$fnorm_resid,
+    dpvdD$fnorm_resid
 )
 
 

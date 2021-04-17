@@ -1,0 +1,39 @@
+---
+title: "XXXXXX"
+author:
+- name: Koki Tsuyuzaki
+  affiliation: Laboratory for Bioinformatics Research,
+    RIKEN Center for Biosystems Dynamics Research
+- name: Itoshi Nikaido
+  affiliation: Laboratory for Bioinformatics Research,
+    RIKEN Center for Biosystems Dynamics Research
+  email: k.t.the-answer@hotmail.co.jp
+graphics: no
+package: DelayedTensor
+output:
+  BiocStyle::html_document
+    toc_float: true
+vignette: |
+  %\VignetteIndexEntry{XXXXXXX}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r style, echo = FALSE, results = 'asis', message=FALSE}
+BiocStyle::markdown()
+```
+
+**Authors**: `r packageDescription("DelayedTensor")[["Author"]] `<br />
+**Last modified:** `r file.info("DelayedTensor.Rmd")$mtime`<br />
+**Compiled**: `r date()`
+
+# XXXXX
+
+XXXXXXX
+
+
+# Session information {.unnumbered}
+
+```{r sessionInfo, echo=FALSE}
+sessionInfo()
+```

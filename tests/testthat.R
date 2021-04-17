@@ -3,6 +3,6 @@ library("rTensor")
 
 options(testthat.use_colours = FALSE)
 
-test_file("testthat/test_DelayedTensor_Class.R")
-test_file("testthat/test_DelayedTensor_Decomp.R")
-test_file("testthat/test_DelayedTensor_Misc.R")
+test_file("testthat/test_AllGenerics.R")
+test_file("testthat/test_Decomp.R")
+test_file("testthat/test_Misc.R")

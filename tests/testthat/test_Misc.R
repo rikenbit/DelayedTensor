@@ -1,169 +1,74 @@
-# context("### 52. hadamard_list ###\n")
-# lizt <- list(
-#     'mat1' = matrix(runif(40), ncol=4),
-#     'mat2' = matrix(runif(40), ncol=4),
-#     'mat3' = matrix(runif(40), ncol=4))
+# Setting
+lizt <- list(
+    'mat1' = matrix(1:6, ncol=2),
+    'mat2' = matrix(7:12, ncol=2),
+    'mat3' = matrix(13:18, ncol=2))
+lizt2 <- list(
+    'mat1' = matrix(runif(30), ncol=3),
+    'mat2' = matrix(runif(40), ncol=4),
+    'mat3' = matrix(runif(50), ncol=5))
+dlizt <- list(
+    'mat1' = DelayedArray(lizt$mat1),
+    'mat2' = DelayedArray(lizt$mat2),
+    'mat3' = DelayedArray(lizt$mat3))
+dlizt2 <- list(
+    'mat1' = DelayedArray(lizt2$mat1),
+    'mat2' = DelayedArray(lizt2$mat2),
+    'mat3' = DelayedArray(lizt2$mat3))
+set.seed(1234)
+tnsr <- new("Tensor", 3L, c(3L, 4L, 5L), data=runif(60))
+darr <- DelayedArray(tnsr@data)
+mat <- matrix(runif(50), nrow=10, ncol=5)
 
-# expect_identical(
-#     rTensor::hadamard_list(lizt),
-#     hadamard_list(lizt))
+context("### list_rep ###\n")
+expect_identical(
+    list_rep(tnsr, 3),
+    list(tnsr, tnsr, tnsr))
 
+context("### modebind_list/rbind_list ###\n")
+expect_equal(
+    as.array(rbind(dlizt[[1]], dlizt[[2]], dlizt[[3]])),
+    as.array(modebind_list(dlizt, m=1)),
+    as.array(rbind_list(dlizt)))
 
-# context("### 53. kronecker_list ###\n")
-# expect_identical(
-#     rTensor::kronecker_list(lizt),
-#     kronecker_list(lizt))
+context("### modebind_list/cbind_list ###\n")
+expect_equal(
+    as.array(cbind(dlizt[[1]], dlizt[[2]], dlizt[[3]])),
+    as.array(modebind_list(dlizt, m=2)),
+    as.array(cbind_list(dlizt)))
 
+context("### hadamard_list ###\n")
+expect_equal(
+    rTensor::hadamard_list(lizt),
+    as.array(hadamard_list(dlizt)))
 
-# context("### 54. khatri_raoa ###\n")
-# A <- matrix(runif(12), ncol=4)
-# B <- matrix(runif(12), ncol=4)
+context("### kronecker_list ###\n")
+expect_equal(
+    rTensor::kronecker_list(lizt),
+    as.array(kronecker_list(dlizt)))
 
-# expect_identical(
-#     rTensor::khatri_rao(A, B),
-#     khatri_rao(A, B))
+context("### khatori_rao_list ###\n")
+expect_equal(
+    rTensor::khatri_rao_list(lizt, reverse=FALSE),
+    as.array(khatri_rao_list(dlizt, reverse=FALSE)))
+expect_equal(
+    rTensor::khatri_rao_list(lizt, reverse=TRUE),
+    as.array(khatri_rao_list(dlizt, reverse=TRUE)))
 
+context("### ttl ###\n")
+expect_equal(
+    rTensor::ttl(tnsr, lizt2, ms=c(1,2,3))@data,
+    as.array(ttl(darr, dlizt2, ms=c(1,2,3))))
 
-# context("### 55. khatori_rao_list ###\n")
-# expect_identical(
-#     rTensor::khatri_rao_list(lizt, reverse=FALSE),
-#     khatri_rao_list(lizt, reverse=FALSE))
+context("### DelayedDiagonalArray ###\n")
+E <- DelayedDiagonalArray(c(3,4,5))
+expect_equal(E[1,1,1], 1)
+expect_equal(E[2,2,2], 1)
+expect_equal(E[3,3,3], 1)
+expect_equal(E[3,4,5], 0)
 
-# expect_identical(
-#     rTensor::khatri_rao_list(lizt, reverse=TRUE),
-#     khatri_rao_list(lizt, reverse=TRUE))
-
-
-# context("### 56. ttm ###\n")
-# mat <- matrix(runif(50),ncol=5)
-
-# expect_identical(
-#     rTensor::ttm(tnsr, mat, m=3)@data,
-#     ttm(dtnsr, mat, m=3)@data)
-
-
-# context("### 57. ttl ###\n")
-# lizt2 <- list(
-#     'mat1' = matrix(runif(30), ncol=3),
-#     'mat2' = matrix(runif(40), ncol=4),
-#     'mat3' = matrix(runif(50), ncol=5))
-
-# expect_identical(
-#     rTensor::ttl(tnsr, lizt2, ms=c(1,2,3))@data,
-#     ttl(tnsr, lizt2, ms=c(1,2,3))@data)
-
-
-# context("### 58. t_mult ###\n")
-# set.seed(1234)
-# tnsr2 <- new("Tensor", 3L, c(4L,3L,5L), data=runif(60))
-# set.seed(1234)
-# dtnsr2 <- new("DelayedTensor", 3L, c(4L,3L,5L), data=runif(60))
-
-# expect_identical(
-#     t_mult(tnsr, tnsr2)@data,
-#     t_mult(dtnsr, dtnsr2)@data)
-
-
-# context("### 59. rand_tensor ###\n")
-# set.seed(1234)
-# A <- rTensor::rand_tensor(modes=c(3,4,5), drop=FALSE)
-# set.seed(1234)
-# B <- rand_tensor(modes=c(3,4,5), drop=FALSE)
-
-# expect_identical(
-#     A@data,
-#     B@data)
-
-# set.seed(1234)
-# C <- rTensor::rand_tensor(modes=c(3,4,1), drop=TRUE)
-# set.seed(1234)
-# D <- rand_tensor(modes=c(3,4,1), drop=TRUE)
-
-# expect_identical(
-#     C@data,
-#     D@data)
-
-
-# context("### 60. fold ###\n")
-# matT3 <- rTensor::unfold(tnsr, row_idx=2, col_idx=c(3,1))
-# tnsr <- rTensor::fold(matT3@data, row_idx=2, col_idx=c(3,1), modes=c(3,4,5))
-
-# dmatT3 <- unfold(dtnsr, row_idx=2, col_idx=c(3,1))
-# dtnsr <- fold(matT3@data, row_idx=2, col_idx=c(3,1), modes=c(3,4,5))
-
-# expect_identical(
-#     tnsr@data,
-#     dtnsr@data)
-
-
-# context("### 61. k_fold ###\n")
-# matT2 <- rTensor::k_unfold(tnsr, m=2)
-
-# expect_identical(
-#     rTensor::k_fold(matT2@data, m=2, modes=c(3,4,5)),
-#     tnsr)
-
-# dmatT2 <- k_unfold(dtnsr, m=2)
-
-# expect_identical(
-#     k_fold(dmatT2@data, m=2, modes=c(3,4,5)),
-#     dtnsr)
-
-
-# context("### 62. unmatvec ###\n")
-# matT1 <- rTensor::matvec(tnsr)
-
-# expect_identical(
-#     rTensor::unmatvec(matT1@data, modes=c(3,4,5)),
-#     tnsr)
-
-# dmatT1 <- matvec(tnsr)
-
-# expect_identical(
-#     unmatvec(dmatT1@data, modes=c(3,4,5)),
-#     dtnsr)
-
-
-# context("### 63. rs_fold ###\n")
-# matT2 <- rTensor::rs_unfold(tnsr, m=2)
-
-# expect_identical(
-#     rTensor::rs_fold(matT2@data, m=2, modes=c(3,4,5)),
-#     tnsr)
-
-# dmatT2 <- rs_unfold(tnsr, m=2)
-
-# expect_identical(
-#     rs_fold(dmatT2@data, m=2, modes=c(3,4,5)),
-#     dtnsr)
-
-
-# context("### 64. cs_fold ###\n")
-# matT1 <- rTensor::cs_unfold(tnsr, m=3)
-
-# expect_identical(
-#     rTensor::cs_fold(matT1@data, m=3, modes=c(3,4,5)),
-#     tnsr)
-
-# dmatT1 <- cs_unfold(tnsr, m=3)
-
-# expect_identical(
-#     cs_fold(dmatT1@data, m=3, modes=c(3,4,5)),
-#     dtnsr)
-
-
-# context("### 65. .ifft ###\n")
-# set.seed(1234)
-# A <- rTensor:::.ifft(matrix(runif(3*5), nrow=3, ncol=5))
-# set.seed(1234)
-# B <- .ifft(matrix(runif(3*5), nrow=3, ncol=5))
-
-# expect_identical(
-#     A,
-#     B)
-
-
-# context("### 66. .superdiagonal_tensor ###\n")
-# expect_identical(
-#     rTensor:::.superdiagonal_tensor(3, 3)@data,
-#     .superdiagonal_tensor(3, 3)@data)
+F <- DelayedDiagonalArray(c(3,4,5), 1:3)
+expect_equal(F[1,1,1], 1)
+expect_equal(F[2,2,2], 2)
+expect_equal(F[3,3,3], 3)
+expect_equal(F[3,4,5], 0)

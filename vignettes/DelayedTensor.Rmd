@@ -1,5 +1,5 @@
 ---
-title: "XXXXXX"
+title: "DelayedTensor"
 author:
 - name: Koki Tsuyuzaki
   affiliation: Laboratory for Bioinformatics Research,
@@ -12,9 +12,8 @@ graphics: no
 package: DelayedTensor
 output:
   BiocStyle::html_document
-    toc_float: true
 vignette: |
-  %\VignetteIndexEntry{XXXXXXX}
+  %\VignetteIndexEntry{DelayedTensor}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -27,10 +26,29 @@ BiocStyle::markdown()
 **Last modified:** `r file.info("DelayedTensor.Rmd")$mtime`<br />
 **Compiled**: `r date()`
 
-# XXXXX
+# Introduction
+## Concept of DelayedTensor
 
-XXXXXXX
+# Tensor arithmetic operations
+## Unfold operations: unfold(), k_unfold(), matvec(), rs_unfold(), cs_unfold(), ttl()
 
+## Fold operations: fold(), k_fold(), unmatvec(), rs_fold(), cs_fold(), ttm()
+
+## Vectorization: vec()
+
+## Norm operations: fnorm(), innerProd()
+
+## Diagonal operations/Diagonal Tensor: diag(), DelayedDiagonalArray()
+
+## Mode-wise operations: modeSum(), modeMean()
+
+## Tensor product operations: hadamard(), hadamard_list(), kronecker(), kronecker_list(), khatri_rao, khatri_rao_list()
+
+## Utilities: list_rep(), modebind_list(), rbind_list(), cbind_list()
+
+# Tensor Decomposition: hosvd(), cp(), tucker(), mpca(), pvd()
+
+# Einsum operation: einsum()
 
 # Session information {.unnumbered}
 

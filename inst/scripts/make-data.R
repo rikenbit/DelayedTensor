@@ -27,9 +27,15 @@ read.delim(outfile2, sep="\t", skip=2, nrow=1, header=FALSE) %>%
 toupper(rownames(mouse)) -> rownames(mouse)
 intersect(rownames(human), rownames(mouse)) -> common.name
 
-human[common.name, ] %>% as.matrix -> human
-mouse[common.name, ] %>% as.matrix -> mouse
+# reduce the number of genes
+apply(human[common.name,], 1, var) -> var_human
+apply(mouse[common.name,], 1, var) -> var_mouse
+var_human + var_mouse -> var_both
+var_both[rank(1/var_both) <= 1000] -> high_var_genes
+common.name[names(high_var_genes)] -> reduced.common.name
+human[reduced.common.name, ] %>% as.matrix -> human_mid_brain
+mouse[reduced.common.name, ] %>% as.matrix -> mouse_mid_brain
 
 # Output
-save(human, file="DelayedTensor/data/human_mid_brain.rda")
-save(mouse, file="DelayedTensor/data/mouse_mid_brain.rda")
+save(human_mid_brain, file="DelayedTensor/data/human_mid_brain.rda")
+save(mouse_mid_brain, file="DelayedTensor/data/mouse_mid_brain.rda")

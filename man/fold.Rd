@@ -36,10 +36,11 @@ by DelayedArray.
 \examples{
 library("DelayedRandomArray")
 darr <- RandomUnifArray(c(2,3,4))
-matT3 <- unfold(darr, row_idx=2, col_idx=c(3,1))
+matT3 <- DelayedTensor::unfold(darr, row_idx=2, col_idx=c(3,1))
 identical(
-	as.array(fold(matT3, row_idx=2,col_idx=c(3,1), modes=c(2,3,4))),
-	as.array(darr))
+    as.array(DelayedTensor::fold(matT3, row_idx=2,col_idx=c(3,1),
+        modes=c(2,3,4))),
+    as.array(darr))
 }
 \references{
 T. Kolda, B. Bader, "Tensor decomposition and applications".

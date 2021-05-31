@@ -30,25 +30,38 @@ BiocStyle::markdown()
 ## Concept of DelayedTensor
 
 # Tensor arithmetic operations
-## Unfold operations: unfold(), k_unfold(), matvec(), rs_unfold(), cs_unfold(), ttl()
+## Setting
 
-## Fold operations: fold(), k_fold(), unmatvec(), rs_fold(), cs_fold(), ttm()
+## Unfold operations
+unfold(), k_unfold(), matvec(), rs_unfold(), cs_unfold(), ttl()
 
-## Vectorization: vec()
+## Fold operations
+fold(), k_fold(), unmatvec(), rs_fold(), cs_fold(), ttm()
 
-## Norm operations: fnorm(), innerProd()
+## Vectorization
+vec()
 
-## Diagonal operations/Diagonal Tensor: diag(), DelayedDiagonalArray()
+## Norm operations
+fnorm(), innerProd()
 
-## Mode-wise operations: modeSum(), modeMean()
+## Diagonal operations/Diagonal Tensor
+diag(), DelayedDiagonalArray()
 
-## Tensor product operations: hadamard(), hadamard_list(), kronecker(), kronecker_list(), khatri_rao, khatri_rao_list()
+## Mode-wise operations
+modeSum(), modeMean()
 
-## Utilities: list_rep(), modebind_list(), rbind_list(), cbind_list()
+## Tensor product operations
+hadamard(), hadamard_list(), kronecker(), kronecker_list(), khatri_rao,
+khatri_rao_list()
 
-# Tensor Decomposition: hosvd(), cp(), tucker(), mpca(), pvd()
+## Utilities
+list_rep(), modebind_list(), rbind_list(), cbind_list()
 
-# Einsum operation: einsum()
+# Tensor Decomposition
+hosvd(), cp(), tucker(), mpca(), pvd()
+
+# Einsum operation
+einsum()
 
 # Session information {.unnumbered}
 

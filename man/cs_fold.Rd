@@ -31,10 +31,10 @@ This is a wrapper function to \code{\link{fold}}.
 \examples{
 library("DelayedRandomArray")
 darr <- RandomUnifArray(c(2,3,4))
-matT3 <- cs_unfold(darr, m=3)
+matT3 <- DelayedTensor::cs_unfold(darr, m=3)
 identical(
-	as.array(cs_fold(matT3, m=3, modes=c(2,3,4))),
-	as.array(darr))
+    as.array(DelayedTensor::cs_fold(matT3, m=3, modes=c(2,3,4))),
+    as.array(darr))
 }
 \references{
 T. Kolda, B. Bader, "Tensor decomposition and applications".

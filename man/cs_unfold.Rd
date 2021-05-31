@@ -26,6 +26,11 @@ by DelayedArray.
 
 This is a wrapper function to \code{\link{unfold}}.
 }
+\examples{
+library("DelayedRandomArray")
+darr <- RandomUnifArray(c(2,3,4))
+DelayedTensor::cs_unfold(darr, m=3)
+}
 \seealso{
 \code{\link{unfold}}, \code{\link{cs_fold}}
 }

@@ -36,8 +36,8 @@ library("DelayedRandomArray")
 darr <- RandomUnifArray(c(2,3,4))
 matT2 <- k_unfold(darr, m=2)
 identical(
-	as.array(k_fold(matT2, m=2, modes=c(2,3,4))),
-	as.array(darr))
+    as.array(k_fold(matT2, m=2, modes=c(2,3,4))),
+    as.array(darr))
 }
 \references{
 T. Kolda, B. Bader, "Tensor decomposition and applications".

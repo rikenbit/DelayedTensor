@@ -5,7 +5,7 @@ import(HDF5Array)
 importClassesFrom(DelayedArray, DelayedArray)
 importFrom(BiocSingular, runExactSVD, runIrlbaSVD)
 importFrom(rTensor, as.tensor)
-importFrom(DelayedRandomArray, RandomUnifArray)
+importFrom(DelayedRandomArray, RandomUnifArray, RandomBinomArray)
 importFrom(einsum, einsum)
 import(BiocStyle)
 import(knitr)
@@ -52,3 +52,4 @@ exportMethods(mpca)
 exportMethods(pvd)
 
 # Einsum.R
+export(einsum)

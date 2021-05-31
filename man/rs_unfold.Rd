@@ -28,6 +28,11 @@ This is a wrapper function to \code{\link{unfold}}.
 
 See also \code{rs_unfold(darr, m=NULL)}
 }
+\examples{
+library("DelayedRandomArray")
+darr <- RandomUnifArray(c(2,3,4))
+matT2 <- rs_unfold(darr, m=2)
+}
 \seealso{
 \code{\link{unfold}}, \code{\link{rs_fold}}
 }

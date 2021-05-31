@@ -35,35 +35,33 @@ library("DelayedRandomArray")
 darr1 <- RandomUnifArray(c(4,8))
 darr2 <- RandomUnifArray(c(8,3))
 
-# # Matrix Multiply
-# darr1 \%*\% darr2
-# einsum("ij,jk -> ik", darr1, darr2)
+# Matrix Multiply
+darr1 \%*\% darr2
+DelayedTensor::einsum("ij,jk -> ik", darr1, darr2)
 
-# # Diag
-# mat_sq <- RandomUnifArray(c(4,4))
-# diag(mat_sq)
-# einsum("ii->i", mat_sq)
-# einsum("ii->ii", mat_sq)
+# Diag
+mat_sq <- RandomUnifArray(c(4,4))
+DelayedTensor::diag(mat_sq)
+einsum("ii->i", mat_sq)
 
-# # Trace
-# sum(diag(mat_sq))
-# einsum("ii->", mat_sq)
+# Trace
+sum(DelayedTensor::diag(mat_sq))
+einsum("ii->", mat_sq)
 
-# # Scalar product
-# darr3 <- RandomUnifArray(c(4,8))
-# darr3 * darr1
-# einsum("ij,ij->ij", darr3, darr1)
+# Scalar product
+darr3 <- RandomUnifArray(c(4,8))
+darr3 * darr1
+einsum("ij,ij->ij", darr3, darr1)
 
-# # Transpose
-# t(darr1)
-# einsum("ij->ji", darr1)
+# Transpose
+t(darr1)
+einsum("ij->ji", darr1)
 
-# # Batched L2 norm
-# # arr1 <- array(c(darr1, darr3), dim = c(dim(darr1), 2))
-# arr1 <- as.array(darr1)
-# arr3 <- as.array(darr3)
-# darr4 <- DelayedArray(array(c(arr1, arr3), dim = c(dim(arr1), 2)))
+# Batched L2 norm
+arr1 <- as.array(darr1)
+arr3 <- as.array(darr3)
+darr4 <- DelayedArray(array(c(arr1, arr3), dim = c(dim(arr1), 2)))
 
-# c(sum(darr1^2), sum(darr3^2))
-# einsum("ijb,ijb->b", darr4, darr4)
+c(sum(darr1^2), sum(darr3^2))
+einsum("ijb,ijb->b", darr4, darr4)
 }

@@ -541,7 +541,7 @@ expect_equal(
     einsum::einsum('i,ij,ijk,ijkl->ijkl', arrA, arrD, arrF, arrH),
     as.array(einsum('i,ij,ijk,ijkl->ijkl', darrA, darrD, darrF, darrH)))
 
-# # cf.
-# # https://www.procrasist.com/entry/einsum
-# # https://github.com/numpy/numpy/blob/623bc1fae1d47df24e7f1e29321d0c0ba2771ce0/numpy/typing/tests/data/pass/einsumfunc.py
-# # https://ajcr.net/Basic-guide-to-einsum/
+# cf.
+# https://www.procrasist.com/entry/einsum
+# https://github.com/numpy/numpy/blob/623bc1fae1d47df24e7f1e29321d0c0ba2771ce0/numpy/typing/tests/data/pass/einsumfunc.py
+# https://ajcr.net/Basic-guide-to-einsum/

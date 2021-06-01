@@ -32,9 +32,8 @@ apply(human[common.name,], 1, var) -> var_human
 apply(mouse[common.name,], 1, var) -> var_mouse
 var_human + var_mouse -> var_both
 var_both[rank(1/var_both) <= 1000] -> high_var_genes
-common.name[names(high_var_genes)] -> reduced.common.name
-human[reduced.common.name, ] %>% as.matrix -> human_mid_brain
-mouse[reduced.common.name, ] %>% as.matrix -> mouse_mid_brain
+human[names(high_var_genes), ] %>% as.matrix -> human_mid_brain
+mouse[names(high_var_genes), ] %>% as.matrix -> mouse_mid_brain
 
 # Output
 save(human_mid_brain, file="DelayedTensor/data/human_mid_brain.rda")

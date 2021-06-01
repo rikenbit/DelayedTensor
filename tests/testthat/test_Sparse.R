@@ -1,14 +1,20 @@
-# # Setting
-# arr <- array(runif(2*3*4), dim=c(2,3,4))
-# ddarr <- DelayedArray(arr)
-# sdarr <- dense2sparse(arr)
+# Setting
+arr <- array(runif(2*3*4), dim=c(2,3,4))
+ddarr <- DelayedArray(arr)
+sdarr <- dense2sparse(arr)
 
-# # AllGenerics.R
-# context("### unfold ###")
-# print("unfold")
-# expect_identical(
-#     is_sparse(unfold(ddarr, row_idx=1, col_idx=c(2, 3, 4))),
-#     is_sparse(unfold(sdarr, row_idx=1, col_idx=c(2, 3, 4))))
+# AllGenerics.R
+context("### unfold ###")
+print("unfold")
+setSparse(FALSE)
+expect_false(is_sparse(unfold(ddarr, row_idx=1, col_idx=c(2, 3))))
+setSparse(TRUE)
+expect_true(is_sparse(unfold(ddarr, row_idx=1, col_idx=c(2, 3))))
+setSparse(FALSE)
+expect_false(is_sparse(unfold(sdarr, row_idx=1, col_idx=c(2, 3))))
+setSparse(TRUE)
+expect_true(is_sparse(unfold(sdarr, row_idx=1, col_idx=c(2, 3))))
+
 
 # context("### modeSum ###")
 # print("modeSum")

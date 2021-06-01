@@ -1,5 +1,5 @@
 ---
-title: "Tensor arithmetic and decomposition based on DelayedArray"
+title: "Tensor arithmetic and decomposition with DelayedArray"
 author:
 - name: Koki Tsuyuzaki
   affiliation: Laboratory for Bioinformatics Research,
@@ -30,49 +30,286 @@ BiocStyle::markdown()
 # Introduction
 ## Concept of DelayedTensor
 
-# Tensor arithmetic operations
-## Setting
 
-```{r Setting, echo=TRUE}
-library("DelayedTensor")
-getSparse()
-getVerbose()
-setSparse(FALSE)
-setSparse(TRUE)
-setVerbose(FALSE)
-setVerbose(TRUE)
+```{r DelayedArray, echo=TRUE}
+suppressPackageStartupMessages(library("DelayedArray"))
+
+arr <- array(runif(2*3*4), dim=c(2,3,4))
+darr <- DelayedArray(arr)
 ```
 
-## Unfold operations
-unfold(), k_unfold(), matvec(), rs_unfold(), cs_unfold(), ttl()
+# Setting
 
-## Fold operations
-fold(), k_fold(), unmatvec(), rs_fold(), cs_fold(), ttm()
+There are several settings to be made in executing the following codes.
+
+First, the sparsity of the intermediate `r Biocpkg("DelayedArray")` objects
+calculated inside `r Biocpkg("DelayedTensor")` is set by `setSparse`.
+
+```{r Setting 1, echo=TRUE}
+suppressPackageStartupMessages(library("DelayedTensor"))
+setSparse(as.sparse=FALSE)
+```
+
+Next, the verbose message is suppressed by `setVerbose`.
+
+```{r Setting 2, echo=TRUE}
+setVerbose(as.verbose=FALSE)
+```
+
+Finally, the block size of block processing is specified by `setAutoBlockSize`.
+
+```{r Setting 3, echo=TRUE}
+setAutoBlockSize(size=1E+8)
+```
+
+These values are also extracted by each getter function.
+
+```{r Setting 4, echo=TRUE}
+getSparse()
+getVerbose()
+getAutoBlockSize()
+```
+
+# Tensor Arithmetic Operations
+## Unfold/Fold Operations
+
+
+```{r Unfold/Fold operations 1, echo=TRUE}
+unfold(darr, row_idx=c(1,2), col_idx=3)
+fold
+```
+
+```{r Unfold/Fold operations 2, echo=TRUE}
+k_unfold
+k_fold
+```
+
+```{r Unfold/Fold operations 3, echo=TRUE}
+matvec
+unmatvec
+```
+
+```{r Unfold/Fold operations 4, echo=TRUE}
+rs_unfold
+rs_fold
+```
+
+```{r Unfold/Fold operations 5, echo=TRUE}
+cs_unfold
+cs_fold
+```
+
+```{r Unfold/Fold operations 6, echo=TRUE}
+ttl
+```
+
+```{r Unfold/Fold operations 7, echo=TRUE}
+ttm
+```
 
 ## Vectorization
-vec()
 
-## Norm operations
-fnorm(), innerProd()
+`vec` collapses a `r Biocpkg("DelayedArray")` into
+a 1D `r Biocpkg("DelayedArray")` (vector).
 
-## Diagonal operations/Diagonal Tensor
-diag(), DelayedDiagonalArray()
+```{r Vectorization, echo=TRUE}
+vec(darr)
+```
 
-## Mode-wise operations
-modeSum(), modeMean()
+## Norm Operations
 
-## Tensor product operations
-hadamard(), hadamard_list(), kronecker(), kronecker_list(), khatri_rao,
-khatri_rao_list()
+`fnorm` calculates the Frobenius norm of a `r Biocpkg("DelayedArray")`.
 
-## Utilities
-list_rep(), modebind_list(), rbind_list(), cbind_list()
+```{r Norm operations 1, echo=TRUE}
+fnorm(darr)
+```
+
+`innerProd` calculates the inner product value of
+two `r Biocpkg("DelayedArray")`.
+
+```{r Norm operations 2, echo=TRUE}
+innerProd(darr, darr)
+```
+
+## Diagonal Operations / Diagonal Tensor
+
+Using `DelayedDiagonalArray`, we can originally create a diagonal
+`r Biocpkg("DelayedArray")` by specifying the dimensions and the values.
+
+```{r Diagonal operations 1, echo=TRUE}
+dgdarr <- DelayedDiagonalArray(c(5,6,7), 1:5)
+dim(dgdarr)
+```
+
+Similar to the `diag` of the `r CRANpkg("base")` package,
+the `diag` of `r Biocpkg("DelayedTensor")` is used to extract
+and assign values to `r Biocpkg("DelayedArray")`.
+
+```{r Diagonal operations 2, echo=TRUE}
+diag(dgdarr)
+```
+
+```{r Diagonal operations 3, echo=TRUE}
+diag(dgdarr) <- c(1111, 2222, 3333, 4444, 5555)
+diag(dgdarr)
+```
+
+## Mode-wise Operations
+
+`modeSum` calculates the summation for a given mode `m` of
+a `r Biocpkg("DelayedArray")`.
+The mode specified as `m` is collapsed into 1D as follows.
+
+```{r Mode-wise operations 1, echo=TRUE}
+modeSum(darr, m=1)
+modeSum(darr, m=2)
+modeSum(darr, m=3)
+```
+
+Similar to `modeSum`, `modeMean` calculates the average value
+for a given mode `m` of a `r Biocpkg("DelayedArray")`.
+
+```{r Mode-wise operations 2, echo=TRUE}
+modeMean(darr, m=1)
+modeMean(darr, m=2)
+modeMean(darr, m=3)
+```
+
+## Tensor Product Operations
+### Hadamard Product
+
+```{r Tensor product operations 1, echo=TRUE}
+hadamard
+```
+
+```{r Tensor product operations 2, echo=TRUE}
+hadamard_list
+```
+
+### Kronecker Product
+
+```{r Tensor product operations 3, echo=TRUE}
+kronecker
+```
+
+```{r Tensor product operations 4, echo=TRUE}
+kronecker_list
+```
+
+### Khatri-Rao Product
+
+
+```{r Tensor product operations 5, echo=TRUE}
+khatri_rao
+```
+
+```{r Tensor product operations 6, echo=TRUE}
+khatri_rao_list
+```
+
+## Utilities Functions
+
+`list_rep` replicates an arbitrary number of any R object.
+
+```{r Utilities 1, echo=TRUE}
+list_rep(darr, 3)
+```
+
+```{r Utilities 2, echo=TRUE}
+modebind_list
+```
+
+```{r Utilities 3, echo=TRUE}
+rbind_list
+```
+
+```{r Utilities 4, echo=TRUE}
+cbind_list
+```
 
 # Tensor Decomposition
-hosvd(), cp(), tucker(), mpca(), pvd()
 
-# Einsum operation
-einsum()
+## Higher-Order Singular Value Decomposition (HOSVD)
+
+For the details, check the `hosvd` function of `r CRANpkg("rTensor")`.
+
+```{r Tensor Decomposition 1, echo=TRUE}
+out_hosvd <- hosvd(darr, ranks=c(2,1,3))
+str(out_hosvd)
+```
+
+## CANDECOMP/PARAFAC (CP) Decomposition
+
+For the details, check the `cp` function of `r CRANpkg("rTensor")`.
+
+```{r Tensor Decomposition 2, echo=TRUE}
+out_cp <- cp(darr, num_components=2)
+str(out_cp)
+```
+
+## Higher-order Orthogonal Iteration (HOOI)
+
+
+For the details, check the `tucker` function of `r CRANpkg("rTensor")`.
+
+```{r Tensor Decomposition 3, echo=TRUE}
+out_tucker <- tucker(darr, ranks=c(2,3,2))
+str(out_tucker)
+```
+
+## Multilinear Principal Component Analysis (MPCA)
+
+For the details, check the `mpca` function of `r CRANpkg("rTensor")`.
+
+```{r Tensor Decomposition 4, echo=TRUE}
+out_mpca <- mpca
+str(out_mpca)
+```
+
+## Population Value Decomposition (PVD)
+
+For the details, check the `pvd` function of `r CRANpkg("rTensor")`.
+
+```{r Tensor Decomposition 5, echo=TRUE}
+out_pvd <- pvd
+str(out_mpca)
+```
+
+# Einsum Operation
+
+Numpy's einsum
+
+https://numpy.org/doc/stable/reference/generated/numpy.einsum.html
+
+1. mutl
+
+https://ajcr.net/Basic-guide-to-einsum/
+
+https://cran.r-project.org/web/packages/einsum/index.html
+
+```{r Einsum operation 1, echo=TRUE}
+suppressPackageStartupMessages(library("einsum"))
+# I x J x K
+arrA <- array(runif(4*5*6), dim=c(4,5,6))
+# I x L
+arrB <- array(runif(4*7), dim=c(4,7))
+# J x M
+arrC <- array(runif(5*2), dim=c(5,2))
+
+em <- einsum::einsum('ijk,il,jm->ijklm', arrA, arrB, arrC)
+dim(em)
+```
+
+
+
+```{r Einsum operation 2, echo=TRUE}
+darrA <- DelayedArray(arrA)
+darrB <- DelayedArray(arrB)
+darrC <- DelayedArray(arrC)
+
+dem <- einsum('ijk,il,jm->ijklm', darrA, darrB, darrC)
+dim(dem)
+```
 
 # Session information {.unnumbered}
 

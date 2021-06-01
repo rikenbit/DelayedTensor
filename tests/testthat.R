@@ -28,8 +28,8 @@ for(size in c(1E+9,1E+8,1E+7,1E+6,1E+5,1E+4,1E+3,1E+2,50,20:1)){
     # source("testthat/test_Decomp.R")
     # source("testthat/test_4thorder.R")
     # source("testthat/test_Einsum_objects.R")
-    source("testthat/test_Einsum.R")
-    gc();gc()
+    # source("testthat/test_Einsum.R")
+    # gc();gc()
 }
 setAutoBlockSize(size=1E+8)
 source("testthat/test_Verbose.R")

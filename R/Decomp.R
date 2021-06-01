@@ -24,7 +24,6 @@ setMethod("hosvd", signature(darr="DelayedArray"),
     }
     #progress bar
     pb <- txtProgressBar(min=0, max=num_modes, style=3)
-
     #loops through and performs SVD on mode-m matricization of darr
     U_list <- vector("list", num_modes)
     for(m in seq_len(num_modes)){
@@ -33,7 +32,6 @@ setMethod("hosvd", signature(darr="DelayedArray"),
         setTxtProgressBar(pb, m)
     }
     close(pb)
-
     #computes the core tensor
     Z <- ttl(darr, lapply(U_list, t), ms=seq_len(num_modes))
     est <- ttl(Z, U_list, ms=seq_len(num_modes))
@@ -53,11 +51,9 @@ setMethod("cp", signature(darr="DelayedArray"),
     # Argument check
     .checkCP(num_components, darr)
     # Setting
-    #initialization via truncated hosvd
     num_modes <- .ndim(darr)
     modes <- dim(darr)
-    U_list <- vector("list", num_modes)
-    unfolded_mat <- vector("list", num_modes)
+    U_list <- unfolded_mat <- vector("list", num_modes)
     darr_norm <- fnorm(darr)
     for(m in seq_len(num_modes)){
         unfolded_mat[[m]] <- rs_unfold(darr, m=m)
@@ -66,62 +62,55 @@ setMethod("cp", signature(darr="DelayedArray"),
     est <- darr
     curr_iter <- 1
     converged <- FALSE
-    #set up convergence check
     fnorm_resid <- rep(0, max_iter)
-    .CHECK_CONV_CP <- function(est){
-        curr_resid <- fnorm(est - darr)
-        fnorm_resid[curr_iter] <<- curr_resid
-        if (curr_iter == 1){
-            return(FALSE)
-        }else{
-            if(abs(curr_resid-fnorm_resid[curr_iter-1])/darr_norm < tol){
-                return(TRUE)
-            }
-            else{
-                return(FALSE)
-            }
-        }
-    }
-    #progress bar
     pb <- txtProgressBar(min=0, max=max_iter, style=3)
-    #main loop (until convergence or max_iter)
     while((curr_iter < max_iter) && (!converged)){
-    setTxtProgressBar(pb, curr_iter)
+        setTxtProgressBar(pb, curr_iter)
         for(m in seq_len(num_modes)){
-            V <- hadamard_list(lapply(U_list[-m],
-                function(x){
+            V_inv <- solve(hadamard_list(lapply(U_list[-m], function(x){
                     x <- as(x, "DelayedMatrix")
-                    t(x) %*% x}))
-            V_inv <- solve(V)
-            tmp <- khatri_rao_list(U_list[-m], reverse=TRUE)
-            tmp <- as(tmp, "DelayedMatrix")
+                    t(x) %*% x})))
+            tmp <- as(khatri_rao_list(U_list[-m],reverse=TRUE), "DelayedMatrix")
             tmp2 <- unfolded_mat[[m]] %*% tmp %*% V_inv
             lambdas <- apply(tmp2, 2, fnorm)
-            U_list[[m]] <- sweep(tmp2, 2, lambdas,"/")
-            Z <- DelayedDiagonalArray(rep(num_components, length=num_modes),
-                lambdas)
+            U_list[[m]] <- sweep(tmp2, 2, lambdas, "/")
+            Z <- DelayedDiagonalArray(
+                rep(num_components, length=num_modes), lambdas)
             est <- ttl(Z, U_list, ms=seq_len(num_modes))
         }
-
-        #checks convergence
-        if(.CHECK_CONV_CP(est)){
+        conv_cp <- .CHECK_CONV_CP(est, darr, curr_iter, fnorm_resid,
+            darr_norm, tol)
+        fnorm_resid <- conv_cp$fnorm_resid
+        conv <- conv_cp$conv
+        if(conv){
             converged <- TRUE
             setTxtProgressBar(pb, max_iter)
         }else{
             curr_iter <- curr_iter + 1
         }
     }
-    if(!converged){
-        setTxtProgressBar(pb, max_iter)
-    }
+    if(!converged){setTxtProgressBar(pb, max_iter)}
     close(pb)
-    #end of main loop
-    #put together return list, and returns
     fnorm_resid <- fnorm_resid[fnorm_resid != 0]
     norm_percent <- (1 - (tail(fnorm_resid, 1) / darr_norm)) * 100
     list(lambdas=lambdas, U=U_list, conv=converged, est=est,
         norm_percent=norm_percent, fnorm_resid = tail(fnorm_resid,1),
         all_resids=fnorm_resid)
+}
+
+.CHECK_CONV_CP <- function(est, darr, curr_iter, fnorm_resid, darr_norm, tol){
+    curr_resid <- fnorm(est - darr)
+    fnorm_resid[curr_iter] <- curr_resid
+    if (curr_iter == 1){
+        return(list(fnorm_resid=fnorm_resid, conv=FALSE))
+    }else{
+        if(abs(curr_resid-fnorm_resid[curr_iter-1])/darr_norm < tol){
+            return(list(fnorm_resid=fnorm_resid, conv=TRUE))
+        }
+        else{
+            return(list(fnorm_resid=fnorm_resid, conv=FALSE))
+        }
+    }
 }
 
 # HOOI (Tucker)
@@ -135,7 +124,6 @@ setMethod("tucker", signature(darr="DelayedArray"),
     # Argument check
     .checkTUCKER(ranks, darr)
     # Setting
-    #initialization via truncated hosvd
     num_modes <- .ndim(darr)
     U_list <- vector("list", num_modes)
     for(m in seq_len(num_modes)){
@@ -147,20 +135,6 @@ setMethod("tucker", signature(darr="DelayedArray"),
     converged <- FALSE
     #set up convergence check
     fnorm_resid <- rep(0, max_iter)
-    .CHECK_CONV_Tucker <- function(Z, U_list){
-        est <- ttl(Z, U_list, ms=seq_len(num_modes))
-        curr_resid <- fnorm(darr - est)
-        fnorm_resid[curr_iter] <<- curr_resid
-        if(curr_iter == 1){
-            return(FALSE)
-        }
-        if(abs(curr_resid - fnorm_resid[curr_iter-1])/darr_norm < tol){
-            return(TRUE)
-        }else{
-            return(FALSE)
-        }
-    }
-    #progress bar
     pb <- txtProgressBar(min=0, max=max_iter, style=3)
     #main loop (until convergence or max_iter)
     while((curr_iter < max_iter) && (!converged)){
@@ -168,16 +142,18 @@ setMethod("tucker", signature(darr="DelayedArray"),
         modes <- .ndim(darr)
         modes_seq <- seq_len(num_modes)
         for(m in modes_seq){
-            #core Z minus mode m
             X <- ttl(darr, lapply(U_list[-m], t), ms=modes_seq[-m])
-            #truncated SVD of X
             U_list[[m]] <-
                 DelayedArray(.svd(rs_unfold(X, m=m), k=ranks[m])$u)
         }
         #compute core tensor Z
         Z <- ttm(X, mat=t(U_list[[num_modes]]), m=num_modes)
         #checks convergence
-        if(.CHECK_CONV_Tucker(Z, U_list)){
+        conv_tucker <- .CHECK_CONV_Tucker(Z, U_list, num_modes, est, darr,
+            curr_iter, fnorm_resid, darr_norm, tol)
+        fnorm_resid <- conv_tucker$fnorm_resid
+        conv <- conv_tucker$conv
+        if(conv){
             converged <- TRUE
             setTxtProgressBar(pb, max_iter)
         }else{
@@ -185,13 +161,26 @@ setMethod("tucker", signature(darr="DelayedArray"),
         }
     }
     close(pb)
-    #end of main loop
-    #put together return list, and returns
     fnorm_resid <- fnorm_resid[fnorm_resid != 0]
     norm_percent <- (1 - (tail(fnorm_resid, 1) / darr_norm)) * 100
     est <- ttl(Z, U_list, ms=seq_len(num_modes))
     list(Z=Z, U=U_list, conv=converged, est=est, norm_percent = norm_percent,
         fnorm_resid=tail(fnorm_resid, 1), all_resids=fnorm_resid)
+}
+
+.CHECK_CONV_Tucker <- function(Z, U_list, num_modes, est, darr,
+    curr_iter, fnorm_resid, darr_norm, tol){
+    est <- ttl(Z, U_list, ms=seq_len(num_modes))
+    curr_resid <- fnorm(darr - est)
+    fnorm_resid[curr_iter] <- curr_resid
+    if(curr_iter == 1){
+        return(list(fnorm_resid=fnorm_resid, conv=FALSE))
+    }
+    if(abs(curr_resid - fnorm_resid[curr_iter-1])/darr_norm < tol){
+        return(list(fnorm_resid=fnorm_resid, conv=TRUE))
+    }else{
+        return(list(fnorm_resid=fnorm_resid, conv=FALSE))
+    }
 }
 
 # MPCA
@@ -205,7 +194,6 @@ setMethod("mpca", signature(darr="DelayedArray"),
     # Argument check
     .checkMPCA(ranks, darr)
     # Setting
-    #initialization via hosvd of M-1 modes
     num_modes <- .ndim(darr)
     stopifnot(length(ranks) == (num_modes - 1))
     ranks <- c(ranks, 1)
@@ -217,48 +205,26 @@ setMethod("mpca", signature(darr="DelayedArray"),
         mode_m_cov <- unfolded_mat %*% t(unfolded_mat)
         U_list[[m]] <- DelayedArray(.svd(mode_m_cov, k=ranks[m])$u)
     }
-    Z_ext <- ttl(darr,
-        lapply(U_list[-num_modes], t),
-            ms=seq_len(num_modes-1))
+    Z_ext <- ttl(darr, lapply(U_list[-num_modes], t), ms=seq_len(num_modes-1))
     darr_norm <- fnorm(darr)
     curr_iter <- 1
     converged <- FALSE
-    #set up convergence check
     fnorm_resid <- rep(0, max_iter)
-    .CHECK_CONV_MPCA <- function(Z_ext, U_list){
-        est <- ttl(Z_ext, U_list[-num_modes], ms=seq_len(num_modes-1))
-        curr_resid <- fnorm(darr - est)
-        fnorm_resid[curr_iter] <<- curr_resid
-        if(curr_iter == 1){
-            return(FALSE)
-        }
-        if(abs(curr_resid-fnorm_resid[curr_iter-1])/darr_norm < tol){
-            return(TRUE)
-        }else{
-            return(FALSE)
-        }
-    }
-    #progress bar
     pb <- txtProgressBar(min=0, max=max_iter, style=3)
-    #main loop (until convergence or max_iter)
     while((curr_iter < max_iter) && (!converged)){
         setTxtProgressBar(pb, curr_iter)
         modes <-dim(darr)
         modes_seq <- seq_len(num_modes-1)
         for(m in modes_seq){
-            #extended core Z minus mode m
-            X <- ttl(darr,
-                lapply(U_list[-c(m,num_modes)], t),
-                    ms=modes_seq[-m])
-            #truncated SVD of X
+            X <- ttl(darr, lapply(U_list[-c(m,num_modes)], t), ms=modes_seq[-m])
             U_list[[m]] <- DelayedArray(.svd(rs_unfold(X,m=m), k=ranks[m])$u)
         }
-        #compute core tensor Z_ext
-        Z_ext <- ttm(X,
-            mat=t(U_list[[num_modes-1]]),
-            m=num_modes-1)
-        #checks convergence
-        if(.CHECK_CONV_MPCA(Z_ext, U_list)){
+        Z_ext <- ttm(X, mat=t(U_list[[num_modes-1]]), m=num_modes-1)
+        conv_mpca <- .CHECK_CONV_MPCA(Z_ext, U_list, num_modes, est, darr,
+            curr_iter, fnorm_resid, darr_norm, tol)
+        fnorm_resid <- conv_mpca$fnorm_resid
+        conv <- conv_mpca$conv
+        if(conv){
             converged <- TRUE
             setTxtProgressBar(pb, max_iter)
         }else{
@@ -266,14 +232,27 @@ setMethod("mpca", signature(darr="DelayedArray"),
         }
     }
     close(pb)
-    #end of main loop
-    #put together return list, and returns
     est <- ttl(Z_ext, U_list[-num_modes], ms=seq_len(num_modes-1))
     fnorm_resid <- fnorm_resid[fnorm_resid!=0]
     norm_percent <-(1 - (tail(fnorm_resid, 1) / darr_norm)) * 100
     list(Z_ext=Z_ext, U=U_list, conv=converged, est=est,
         norm_percent = norm_percent, fnorm_resid=tail(fnorm_resid,1),
         all_resids=fnorm_resid)
+}
+
+.CHECK_CONV_MPCA <- function(Z_ext, U_list, num_modes, est, darr, curr_iter,
+fnorm_resid, darr_norm, tol){
+    est <- ttl(Z_ext, U_list[-num_modes], ms=seq_len(num_modes-1))
+    curr_resid <- fnorm(darr - est)
+    fnorm_resid[curr_iter] <- curr_resid
+    if(curr_iter == 1){
+        return(list(fnorm_resid=fnorm_resid, conv=FALSE))
+    }
+    if(abs(curr_resid-fnorm_resid[curr_iter-1])/darr_norm < tol){
+        return(list(fnorm_resid=fnorm_resid, conv=TRUE))
+    }else{
+        return(list(fnorm_resid=fnorm_resid, conv=FALSE))
+    }
 }
 
 # PVD
@@ -285,13 +264,10 @@ setMethod("pvd", signature(darr="DelayedArray"),
         .pvd(darr, uranks, wranks, a, b)})
 .pvd <- function(darr, uranks, wranks, a, b){
     # Argument check
-    .checkPVD(uranks, wranks, a, b, darr)
+    .checkPVD(uranks, wranks, a, b, darr, modes)
     # Setting
     modes <- dim(darr)
     n <- modes[3]
-    if(length(uranks) != n || length(wranks) != n){
-        stop("ranks must be of length n3")
-    }
     pb <- txtProgressBar(min=0, max=(n+3), style=3)
     Us <- vector('list', n)
     Vs <- vector('list', n)
@@ -306,16 +282,13 @@ setMethod("pvd", signature(darr="DelayedArray"),
     # cbind
     U <- cbind_list(Us)
     U <- list_rep(U, sum(uranks)*n/ncol(U))
-    U <- cbind_list(U)
-    U <- as(U, "DelayedMatrix")
+    U <- as(cbind_list(U), "DelayedMatrix")
     P <- DelayedArray(.svd(U %*% t(U), k=a)$u)
     setTxtProgressBar(pb, n+1)
     # cbind
     V <- cbind_list(Vs)
     V <- list_rep(V, sum(wranks)*n/ncol(V))
-    V <- cbind_list(V)
-    V <- as(V, "DelayedMatrix")
-    #eigenV <- eigen(V%*%t(V))
+    V <- as(cbind_list(V), "DelayedMatrix")
     Dt <- DelayedArray(.svd(V %*% t(V), k=b)$u)
     D <- t(Dt)
     setTxtProgressBar(pb, n+2)

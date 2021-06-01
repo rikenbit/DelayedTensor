@@ -129,16 +129,15 @@ setMethod("modeSum", signature(darr="DelayedArray"),
         block1 <- read_block(as(sink, "DelayedArray"), viewport)
         block2 <- .block_modesum(darr_p, darr_p_grid, bid)
         sink <- write_block(sink, viewport, block1 + block2)
-        cat(paste0("\\ Processing viewport ",
-            bid, "/", length(sink_grid),
-            " ... OK\n"))
+        if(getVerbose()$delayedtensor.verbose){
+            cat(paste0("\\ Processing viewport ",
+                bid, "/", length(sink_grid), " ... OK\n"))
+        }
     }
     close(sink)
     out <- as(sink, "DelayedArray")
-    # reshape
     out <- .realize_and_return(aperm(out, revperm))
     if(drop){
-        # drop
         dif <- setdiff(seq_len(num_modes), m)
         out <- .realize_and_return(aperm(out, dif))
     }
@@ -252,7 +251,8 @@ setMethod("hadamard",
         block <- .block_hadamard(darr1, darr2, sink_grid, bid)
         write_block(sink, sink_viewport, block)
     }
-    sink <- gridReduce(FUN, sink_grid, sink, verbose=TRUE)
+    sink <- gridReduce(FUN, sink_grid, sink,
+        verbose=getVerbose()$delayedtensor.verbose)
     close(sink)
     as(sink, "DelayedArray")
 }
@@ -310,9 +310,10 @@ setMethod("kronecker",
         block <- .block_kronecker(darr1, darr2,
             darr_grid_1, darr_grid_2, bid, block_modes)
         sink <- write_block(sink, viewport, block)
-        cat(paste0("\\ Processing viewport ",
-            bid, "/", length(sink_grid),
-            " ... OK\n"))
+        if(getVerbose()$delayedtensor.verbose){
+            cat(paste0("\\ Processing viewport ",
+                bid, "/", length(sink_grid), " ... OK\n"))
+        }
     }
     close(sink)
     as(sink, "DelayedArray")
@@ -393,9 +394,10 @@ setMethod("khatri_rao",
         block <- .block_khatri_rao(darr1, darr2,
             darr_grid_1, darr_grid_2, bid, block_modes)
         sink <- write_block(sink, viewport, block)
-        cat(paste0("\\ Processing viewport ",
-            bid, "/", length(sink_grid),
-            " ... OK\n"))
+        if(getVerbose()$delayedtensor.verbose){
+            cat(paste0("\\ Processing viewport ",
+                bid, "/", length(sink_grid), " ... OK\n"))
+        }
     }
     close(sink)
     as(sink, "DelayedArray")

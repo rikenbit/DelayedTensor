@@ -1,5 +1,5 @@
 ---
-title: "DelayedTensor"
+title: "Tensor arithmetic and decomposition based on DelayedArray"
 author:
 - name: Koki Tsuyuzaki
   affiliation: Laboratory for Bioinformatics Research,
@@ -11,7 +11,8 @@ author:
 graphics: no
 package: DelayedTensor
 output:
-  BiocStyle::html_document
+  BiocStyle::html_document:
+    toc_float: true
 vignette: |
   %\VignetteIndexEntry{DelayedTensor}
   %\VignetteEngine{knitr::rmarkdown}
@@ -31,6 +32,16 @@ BiocStyle::markdown()
 
 # Tensor arithmetic operations
 ## Setting
+
+```{r Setting, echo=TRUE}
+library("DelayedTensor")
+getSparse()
+getVerbose()
+setSparse(FALSE)
+setSparse(TRUE)
+setVerbose(FALSE)
+setVerbose(TRUE)
+```
 
 ## Unfold operations
 unfold(), k_unfold(), matvec(), rs_unfold(), cs_unfold(), ttl()

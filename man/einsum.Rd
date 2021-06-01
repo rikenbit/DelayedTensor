@@ -19,7 +19,7 @@ mode. This means that the \code{subscripts} must contain '->'.}
 The \code{einsum} function returns an array with one dimension for each index
 in the result of the \code{subscripts}.
 For example \code{"ij,jk->ik"} produces a 2-dimensional array,
- \code{"abc,cd,de->abe"} produces a 3-dimensional array.
+\code{"abc,cd,de->abe"} produces a 3-dimensional array.
 }
 \description{
 Einstein summation is a convenient and concise notation for operations

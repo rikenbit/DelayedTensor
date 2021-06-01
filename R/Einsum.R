@@ -43,9 +43,10 @@ einsum <- function(subscripts, ...){
                 modes, idx)
             sink <- .write_block(new_modes, idx, sink_grid,
                 sink, block1, block2)
-            cat(paste0("\\ Processing viewport ",
-                bid, "/", length(idx_grids),
-                " ... OK\n"))
+            if(getVerbose()$delayedtensor.verbose){
+                cat(paste0("\\ Processing viewport ",
+                    bid, "/", length(idx_grids), " ... OK\n"))
+            }
         }
         close(sink)
         as(sink, "DelayedArray")
@@ -126,15 +127,15 @@ einsum <- function(subscripts, ...){
     for(i in seq_len(num_modes)){
         limit1 <- prod(all_modes[seq_len(i)])
         limit2 <- max(unlist(lapply(modes, function(x){
-                    target <- unlist(lapply(names(x), function(xx){
-                        which(names(xx) == names(all_modes[seq_len(i)]))
-                    }))
-                    prod(x[target])})))
+                    target <- unlist(lapply(
+                        names(all_modes[seq_len(i)]),
+                            function(xx){which(xx == names(x))}))
+                                prod(x[target])})))
         limit <- max(limit1, limit2)
         if(limit <= block.size){
             all_spacings[i] <- all_modes[i]
         }else{
-            all_spacings[i] <- 1
+            all_spacings[i] <- max(1, floor(block.size/(limit/all_modes[i])))
         }
     }
     all_spacings
@@ -167,15 +168,12 @@ einsum <- function(subscripts, ...){
     if(no_comma == -1){
         no_comma <- 0
     }
-    # DelayedArray
     lapply(operands, .checkDelayedArray)
-    # X,X
     if(no_operands-1 != no_comma){
         msg <- paste0("(No. of operands - 1) and (No. of ,) are ",
             no_operands-1, " and ", no_comma, " and different!")
         stop(msg)
     }
-    # ->
     if(length(grep("->", subscripts)) != 1){
         if(length(grep("->", subscripts)) == 0){
             msg <- paste0("Please make sure that equation_string ",
@@ -187,12 +185,9 @@ einsum <- function(subscripts, ...){
         }
         stop(msg)
     }
-    # Left part of ->
     lfs <- .left_sub(subscripts)
     split_subscripts <- strsplit(lfs, ",")[[1]]
-    # Right part of ->
     rhs <- .right_sub(subscripts)
-    #
     check_perm <- .check_perm(lfs, rhs)
     # all_modes
     all_modes <- .s_to_d(subscripts, operands)

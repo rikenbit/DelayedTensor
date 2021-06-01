@@ -16,7 +16,7 @@ modebind_list <- function(L, m=NULL){
     m_modes <- unlist(lapply(L, function(x,m){dim(x)[m]}, m=m))
     new_modes <- as.integer(dim(L[[1]]))
     new_modes[m] <- sum(m_modes)
-new_modes <- as.integer(new_modes)
+    new_modes <- as.integer(new_modes)
     # Vectorization
     Lvec <- lapply(L, function(x){vec(x)})
     cmd <- paste0("Lvec <- rbind(",

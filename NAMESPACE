@@ -10,7 +10,7 @@ importFrom(einsum, einsum)
 import(BiocStyle)
 import(knitr)
 
-# AllGenerics.R
+# Generics.R
 exportMethods(unfold)
 exportMethods(k_unfold)
 exportMethods(matvec)
@@ -53,3 +53,9 @@ exportMethods(pvd)
 
 # Einsum.R
 export(einsum)
+
+# Global-settings.R
+export(setSparse)
+export(getSparse)
+export(setVerbose)
+export(getVerbose)

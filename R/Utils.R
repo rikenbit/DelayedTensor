@@ -28,7 +28,8 @@
             dim(sink_viewport))
         write_block(sink, sink_viewport, block)
     }
-    sink <- gridReduce(FUN, sink_grid, sink, verbose=TRUE)
+    sink <- gridReduce(FUN, sink_grid, sink,
+        verbose=getVerbose()$delayedtensor.verbose)
     close(sink)
     as(sink, "DelayedArray")
 }
@@ -204,7 +205,7 @@
     }
 }
 
-.checkPVD <- function(uranks, wranks, a, b, darr){
+.checkPVD <- function(uranks, wranks, a, b, darr, modes){
     if(.ndim(darr) != 3){
         stop("PVD only for 3D")
     }
@@ -222,6 +223,10 @@
     }
     if(is.null(a) || is.null(b)){
         stop("a and b must be specified")
+    }
+    n <- modes[3]
+    if(length(uranks) != n || length(wranks) != n){
+        stop("ranks must be of length n3")
     }
 }
 

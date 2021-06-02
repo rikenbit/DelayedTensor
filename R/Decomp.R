@@ -264,7 +264,7 @@ setMethod("pvd", signature(darr="DelayedArray"),
         .pvd(darr, uranks, wranks, a, b)})
 .pvd <- function(darr, uranks, wranks, a, b){
     # Argument check
-    .checkPVD(uranks, wranks, a, b, darr, modes)
+    .checkPVD(uranks, wranks, a, b, darr)
     # Setting
     modes <- dim(darr)
     n <- modes[3]

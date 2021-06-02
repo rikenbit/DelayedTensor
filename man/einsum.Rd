@@ -24,6 +24,8 @@ For example \code{"ij,jk->ik"} produces a 2-dimensional array,
 \description{
 Einstein summation is a convenient and concise notation for operations
 on n-dimensional arrays.
+
+NOTE: Sparse mode of einsum is not available for now.
 }
 \details{
 This function is an extension of the \code{\link[einsum]{einsum}}

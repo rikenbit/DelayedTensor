@@ -12,6 +12,8 @@ Imports: methods,
     BiocSingular,
     rTensor,
     DelayedRandomArray,
+    irlba,
+    Matrix,
     einsum,
     BiocStyle,
     knitr

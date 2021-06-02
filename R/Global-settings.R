@@ -1,4 +1,4 @@
-setSparse <- function(as.sparse=TRUE){
+setSparse <- function(as.sparse=FALSE){
     stopifnot(is.logical(as.sparse))
     options(delayedtensor.sparse = as.sparse)
 }

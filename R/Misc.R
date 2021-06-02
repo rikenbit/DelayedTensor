@@ -24,12 +24,16 @@ modebind_list <- function(L, m=NULL){
         ")")
     eval(parse(text=cmd))
     Lvec <- .realize_and_return(Lvec)
-    # Reshaping
-    # This part might be implemented by ReshapedHDF5Array in near future
-    # tmpfile <- tempfile()
-    # writeHDF5Array(Lvec, filepath=tmpfile, name="tmp", as.sparse=TRUE)
-    # sink <- ReshapedHDF5Array(tmpfile, "tmp", new_modes)
-    Lvec <- .reshapeIncNumbers1D(Lvec, new_modes)
+    if(getSparse()$delayedtensor.sparse){
+        Lvec <- .reshapeIncNumbers1DSparse(Lvec, new_modes)
+    }else{
+        Lvec <- .reshapeIncNumbers1D(Lvec, new_modes)
+        # Reshaping
+        # This part might be implemented by ReshapedHDF5Array in near future
+        # tmpfile <- tempfile()
+        # writeHDF5Array(Lvec, filepath=tmpfile, name="tmp", as.sparse=TRUE)
+        # sink <- ReshapedHDF5Array(tmpfile, "tmp", new_modes)
+    }
     .realize_and_return(Lvec)
 }
 
@@ -131,21 +135,13 @@ DelayedDiagonalArray <- function(shape, value){
     num_modes <- length(shape)
     min.s <- min(shape)
     if(missing(value)){
-        cmd <- "] <- 1}"
-    }else{
-        len.v <- length(value)
-        if(min.s != len.v && len.v != 1){
-            stop("min(shape) and length(value) must be the same value")
-        }
-        if(len.v == 1){
-            cmd <- "] <- value}"
-        }else{
-            cmd <- "] <- value[i]}"
-        }
+        value <- rep(1L, num_modes)
     }
-    darr <- RandomBinomArray(shape, size=0, prob=0)
-    diag(darr) <- value
-    .realize_and_return(darr)
+    out <- SparseArraySeed(shape)
+    out@nzdata <- value
+    out@nzindex <-  t(vapply(seq_len(min.s),
+        function(x){rep(x, num_modes)}, rep(1L, num_modes)))
+    DelayedArray(out)
 }
 
 # Ref

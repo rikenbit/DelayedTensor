@@ -1,3 +1,24 @@
+.array <- function(dim){
+    dim <- as.integer(dim)
+    setAutoRealizationBackend("HDF5Array")
+    sink <- AutoRealizationSink(dim)
+    close(sink)
+    as(sink, "DelayedArray")
+}
+
+# for fold, unfold, and modebind_list
+.reshapeIncNumbers1DSparse <- function(vecobj, new_modes){
+    out <- SparseArraySeed(new_modes)
+    target <- which(vecobj != 0)
+    if(length(target) == 0){
+        .array(new_modes)
+    }else{
+        out@nzindex <- Lindex2Mindex(target, new_modes)
+        out@nzdata <- as.integer(vecobj[target])
+        DelayedArray(out)
+    }
+}
+
 # for fold, unfold, and modebind_list
 .reshapeIncNumbers1D <- function(vecobj, new_modes){
     # Setting
@@ -24,8 +45,8 @@
     FUN <- function(sink_viewport, sink) {
         bid <- currentBlockId()
         block <- .block_reshape(
-            read_block(vecobj, vec_grid[[bid]]),
-            dim(sink_viewport))
+                    read_block(vecobj, vec_grid[[bid]]),
+                    dim(sink_viewport))
         write_block(sink, sink_viewport, block)
     }
     sink <- gridReduce(FUN, sink_grid, sink,
@@ -34,6 +55,11 @@
     as(sink, "DelayedArray")
 }
 
+.block_reshape <- function(x, dim){
+    out <- array(0, dim)
+    out[] <- as.vector(x)
+    out
+}
 
 # Block Size Scheduling
 .zeros <- function(n){
@@ -205,7 +231,8 @@
     }
 }
 
-.checkPVD <- function(uranks, wranks, a, b, darr, modes){
+.checkPVD <- function(uranks, wranks, a, b, darr){
+    modes <- dim(darr)
     if(.ndim(darr) != 3){
         stop("PVD only for 3D")
     }

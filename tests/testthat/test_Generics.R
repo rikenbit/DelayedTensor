@@ -134,6 +134,11 @@ expect_equal(
     rTensor::innerProd(tnsr, tnsr),
     innerProd(darr, darr))
 
+context("### outerProd ###\n")
+expect_equal(
+    dim(outerProd(darr, darr)),
+    c(dim(darr), dim(darr)))
+
 context("### vec ###\n")
 expect_identical(
 	as.vector(rTensor::vec(tnsr)),

@@ -1,0 +1,437 @@
+---
+title: "2. Tensor arithmetic by DelayedTensor"
+author:
+- name: Koki Tsuyuzaki
+  affiliation: Laboratory for Bioinformatics Research,
+    RIKEN Center for Biosystems Dynamics Research
+- name: Itoshi Nikaido
+  affiliation: Laboratory for Bioinformatics Research,
+    RIKEN Center for Biosystems Dynamics Research
+  email: k.t.the-answer@hotmail.co.jp
+graphics: no
+package: DelayedTensor
+output:
+  BiocStyle::html_document:
+    toc_float: true
+vignette: |
+  %\VignetteIndexEntry{TensorArithmetic}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r style, echo = FALSE, results = 'asis', message=FALSE}
+BiocStyle::markdown()
+```
+
+**Authors**: `r packageDescription("DelayedTensor")[["Author"]] `<br />
+**Last modified:** `r file.info("DelayedTensor_2.Rmd")$mtime`<br />
+**Compiled**: `r date()`
+
+# Setting
+
+```{r Setting 1, echo=TRUE}
+suppressPackageStartupMessages(library("DelayedTensor"))
+suppressPackageStartupMessages(library("DelayedArray"))
+suppressPackageStartupMessages(library("DelayedRandomArray"))
+
+darr1 <- RandomUnifArray(c(2,3,4))
+darr2 <- RandomUnifArray(c(2,3,4))
+```
+
+There are several settings in `r Biocpkg("DelayedTensor")`.
+
+First, the sparsity of the intermediate `r Biocpkg("DelayedArray")` objects
+calculated inside `r Biocpkg("DelayedTensor")` is set by `setSparse`.
+
+Note that the sparse mode is experimental.
+
+Whether it contributes to higher speed and lower memory is quite dependent
+on the sparsity of the `r Biocpkg("DelayedArray")`,
+and the current implementation does not recognize the block size,
+which may cause out-of-memory errors, when the data is extreamly huge.
+
+Here, we specify `as.sparse` as `FALSE`
+(this is also the default value for now).
+
+```{r Setting 2, echo=TRUE}
+setSparse(as.sparse=FALSE)
+```
+
+Next, the verbose message is suppressed by `setVerbose`.
+This is useful when we want to monitor the calculation process.
+
+Here we specify `as.verbose` as `FALSE`
+(this is also the default value for now).
+
+```{r Setting 3, echo=TRUE}
+setVerbose(as.verbose=FALSE)
+```
+
+Finally, the block size of block processing is specified by `setAutoBlockSize`.
+When the sparse mode is off, all the functions of `r Biocpkg("DelayedTensor")`
+are performed as block processing,
+in which each block vector/matrix/tensor is expanded to memory space
+from on-disk file incrementally so as not to exceed the specified size.
+
+Here, we specify the block size as `1E+8`.
+
+```{r Setting 4, echo=TRUE}
+setAutoBlockSize(size=1E+8)
+```
+
+These specified values are also extracted by each getter function.
+
+```{r Setting 5, echo=TRUE}
+getSparse()
+getVerbose()
+getAutoBlockSize()
+```
+
+# Tensor Arithmetic Operations
+## Unfold/Fold Operations
+
+Unfold (a.k.a. matricizing) operations are used to reshape a tensor into a
+matrix.
+
+![Figure 1: Unfold/Fold Operasions](Figure2_1.png)
+
+In `unfold`, `row_idx`/`col_idx` are specified to set which modes are used
+as the row/column.
+
+```{r Unfold/Fold operations 1, echo=TRUE}
+dmat1 <- unfold(darr1, row_idx=c(1,2), col_idx=3)
+dmat1
+```
+
+`fold` is the inverse operation of `unfold`, which is used to reshape
+a matrix into a tensor.
+
+In `fold`, `row_idx`/`col_idx` are specified to set which modes correspond
+the row/column of the output tensor and `modes`
+is specified to set the mode of the output tensor.
+
+```{r Unfold/Fold operations 2, echo=TRUE}
+dmat1_to_darr1 <- DelayedTensor::fold(dmat1,
+    row_idx=c(1,2), col_idx=3, modes=dim(darr1))
+dmat1_to_darr1
+identical(as.array(darr1), as.array(dmat1_to_darr1))
+```
+
+There are some wrapper fuctions of `unfold` and `fold`.
+
+For example, in `k_unfold`, mode `m` is used as the row and the other modes
+are is used as the column.
+
+`k_fold` is the inverse operation of `k_unfold`.
+
+```{r Unfold/Fold operations 3, echo=TRUE}
+dmat2 <- k_unfold(darr1, m=1)
+dmat2_to_darr1 <- k_fold(dmat2, m=1, modes=dim(darr1))
+identical(as.array(darr1), as.array(dmat2_to_darr1))
+
+dmat3 <- k_unfold(darr1, m=2)
+dmat3_to_darr1 <- k_fold(dmat3, m=2, modes=dim(darr1))
+identical(as.array(darr1), as.array(dmat3_to_darr1))
+
+dmat4 <- k_unfold(darr1, m=3)
+dmat4_to_darr1 <- k_fold(dmat4, m=3, modes=dim(darr1))
+identical(as.array(darr1), as.array(dmat4_to_darr1))
+```
+
+In `rs_unfold`, mode `m` is used as the row and the other modes
+are is used as the column.
+
+`rs_fold` and `rs_unfold` also perform the same operations.
+
+On the other hand, `cs_unfold` specifies the mode `m` as the column
+and the other modes are specified as the column.
+
+`cs_fold` is the inverse operation of `cs_unfold`.
+
+```{r Unfold/Fold operations 4, echo=TRUE}
+dmat8 <- cs_unfold(darr1, m=1)
+dmat8_to_darr1 <- cs_fold(dmat8, m=1, modes=dim(darr1))
+identical(as.array(darr1), as.array(dmat8_to_darr1))
+
+dmat9 <- cs_unfold(darr1, m=2)
+dmat9_to_darr1 <- cs_fold(dmat9, m=2, modes=dim(darr1))
+identical(as.array(darr1), as.array(dmat9_to_darr1))
+
+dmat10 <- cs_unfold(darr1, m=3)
+dmat10_to_darr1 <- cs_fold(dmat10, m=3, modes=dim(darr1))
+identical(as.array(darr1), as.array(dmat10_to_darr1))
+```
+
+In `matvec`, m=2 is specified as unfold.
+
+`unmatvec` is the inverse operation of `matvec`.
+
+```{r Unfold/Fold operations 5, echo=TRUE}
+dmat11 <- matvec(darr1)
+dmat11_darr1 <- unmatvec(dmat11, modes=dim(darr1))
+identical(as.array(darr1), as.array(dmat11_darr1))
+```
+
+`ttm` multiplies a tensor by a matrix.
+
+`m` specifies in which mode the matrix will be multiplied.
+
+```{r Unfold/Fold operations 7, echo=TRUE}
+dmatZ <- RandomUnifArray(c(10,4))
+ttm(darr1, dmatZ, m=3)
+```
+
+`ttl` multiplies a tensor by multiple matrices.
+
+`ms` specifies in which mode these matrices will be multiplied.
+
+```{r Unfold/Fold operations 6, echo=TRUE}
+dmatX <- RandomUnifArray(c(10,2))
+dmatY <- RandomUnifArray(c(10,3))
+dlizt <- list(dmatX = dmatX, dmatY = dmatY)
+ttl(darr1, dlizt, ms=c(1,2))
+```
+
+## Vectorization
+
+`vec` collapses a `r Biocpkg("DelayedArray")` into
+a 1D `r Biocpkg("DelayedArray")` (vector).
+
+![Figure 2: Vectorization](Figure2_2.png)
+
+```{r Vectorization, echo=TRUE}
+vec(darr1)
+```
+
+## Norm Operations
+
+`fnorm` calculates the Frobenius norm of a `r Biocpkg("DelayedArray")`.
+
+![Figure 3: Norm Operations](Figure2_3.png)
+
+```{r Norm operations 1, echo=TRUE}
+fnorm(darr1)
+```
+
+`innerProd` calculates the inner product value of two
+`r Biocpkg("DelayedArray")`.
+
+```{r Norm operations 2, echo=TRUE}
+innerProd(darr1, darr2)
+```
+
+## Outer Product
+
+Inner product multiplies two tensors and collapsed to 0D tensor (norm).
+On the hand, outer product is an operation that leaves all subscripts intact.
+
+![Figure 4: Outer Product](Figure2_4.png)
+
+```{r Outer Product, echo=TRUE}
+outerProd(darr1[,,1], darr2[,,1])
+```
+
+## Diagonal Operations
+
+Using `DelayedDiagonalArray`, we can originally create a diagonal
+`r Biocpkg("DelayedArray")` by specifying the dimensions (modes) and the values.
+
+![Figure 5: Diagonal Operations](Figure2_5.png)
+
+```{r Diagonal operations 1, echo=TRUE}
+dgdarr <- DelayedDiagonalArray(c(5,6,7), 1:5)
+dgdarr
+```
+
+Similar to the `diag` of the `r CRANpkg("base")` package,
+the `diag` of `r Biocpkg("DelayedTensor")` is used to extract
+and assign values to `r Biocpkg("DelayedArray")`.
+
+```{r Diagonal operations 2, echo=TRUE}
+DelayedTensor::diag(dgdarr)
+```
+
+```{r Diagonal operations 3, echo=TRUE}
+DelayedTensor::diag(dgdarr) <- c(1111, 2222, 3333, 4444, 5555)
+DelayedTensor::diag(dgdarr)
+```
+
+## Mode-wise Operations
+
+`modeSum` calculates the summation for a given mode `m` of
+a `r Biocpkg("DelayedArray")`.
+The mode specified as `m` is collapsed into 1D as follows.
+
+![Figure 6: Mode-wise Operations](Figure2_6.png)
+
+```{r Mode-wise operations 1, echo=TRUE}
+modeSum(darr1, m=1)
+modeSum(darr1, m=2)
+modeSum(darr1, m=3)
+```
+
+Similar to `modeSum`, `modeMean` calculates the average value
+for a given mode `m` of a `r Biocpkg("DelayedArray")`.
+
+```{r Mode-wise operations 2, echo=TRUE}
+modeMean(darr1, m=1)
+modeMean(darr1, m=2)
+modeMean(darr1, m=3)
+```
+
+## Tensor Product Operations
+
+There are some tensor specific product such as Hadamard product,
+Kronecker product, and Khatri-Rao product.
+
+### Hadamard Product
+
+Suppose a tensor $A \in \Re ^{I \times J}$ and
+a tensor $B \in \Re ^{I \times J}$.
+
+Hadamard product is defined as the element-wise product of $A$ and $B$.
+
+![Figure 7: Hadamard Product](Figure2_7.png)
+
+Hadamard product can be extended to higher-order tensors.
+
+$$
+A \circ B = \begin{bmatrix}
+a_{11}b_{11} & a_{12}b_{12} & \cdots & a_{1J}b_{1J} \\
+a_{21}b_{21} & a_{22}b_{22} & \cdots & a_{2J}b_{2J} \\
+\vdots & \vdots & \ddots & \vdots \\
+a_{I1}b_{I1} & a_{I2}b_{I2} & \cdots & a_{IJ}b_{IJ} \\
+\end{bmatrix}
+$$
+
+`hadamard` calculates Hadamard product of two `r Biocpkg("DelayedArray")`
+objects.
+
+```{r Tensor product operations 1, echo=TRUE}
+prod_h <- hadamard(darr1, darr2)
+dim(prod_h)
+```
+
+`hadamard_list` calculates Hadamard product of multiple
+`r Biocpkg("DelayedArray")` objects.
+
+```{r Tensor product operations 2, echo=TRUE}
+prod_hl <- hadamard_list(list(darr1, darr2))
+dim(prod_hl)
+```
+
+### Kronecker Product
+
+Suppose a tensor $A \in \Re ^{I \times J}$ and
+a tensor $B \in \Re ^{K \times L}$.
+
+Kronecker product is defined as all the possible combination of element-wise
+product and the dimensions of output tensor is ${IK \times JL}$.
+
+![Figure 8: Kronecker Product](Figure2_8.png)
+
+Kronecker product can be extended to higher-order tensors.
+
+$$
+A \otimes B = \begin{bmatrix}
+a_{11}B & a_{12}B & \cdots & a_{1J}B \\
+a_{21}B & a_{22}B & \cdots & a_{2J}B \\
+\vdots & \vdots & \ddots & \vdots \\
+a_{I1}B & a_{I2}B & \cdots & a_{IJ}B \\
+\end{bmatrix}
+$$
+
+`kronecker` calculates Kronecker product of two `r Biocpkg("DelayedArray")`
+objects.
+
+```{r Tensor product operations 3, echo=TRUE}
+prod_kron <- kronecker(darr1, darr2)
+dim(prod_kron)
+```
+
+`kronecker_list` calculates Kronecker product of multiple
+`r Biocpkg("DelayedArray")` objects.
+
+```{r Tensor product operations 4, echo=TRUE}
+prod_kronl <- kronecker_list(list(darr1, darr2))
+dim(prod_kronl)
+```
+
+### Khatri-Rao Product
+
+Suppose a tensor $A \in \Re ^{I \times J}$ and
+a tensor $B \in \Re ^{K \times J}$.
+
+Khatri-Rao product is defined as the column-wise Kronecker product
+and the dimensions of output tensor is ${IK \times J}$.
+
+$$
+A \odot B = \begin{bmatrix}
+a_{1} \otimes a_{1} & a_{2} \otimes a_{2} & \cdots & a_{J} \otimes a_{J} \\
+\end{bmatrix}
+$$
+
+![Figure 9: Khatri-Rao Product](Figure2_9.png)
+
+Khatri-Rao product can only be used for 2D tensors (matrices).
+
+`khatri_rao` calculates Khatri-Rao product of two `r Biocpkg("DelayedArray")`
+objects.
+
+```{r Tensor product operations 5, echo=TRUE}
+prod_kr <- khatri_rao(darr1[,,1], darr2[,,1])
+dim(prod_kr)
+```
+
+`khatri_rao_list` calculates Khatri-Rao product of multiple
+`r Biocpkg("DelayedArray")` objects.
+
+```{r Tensor product operations 6, echo=TRUE}
+prod_krl <- khatri_rao_list(list(darr1[,,1], darr2[,,1]))
+dim(prod_krl)
+```
+
+## Utilities Functions
+
+`list_rep` replicates an arbitrary number of any R object.
+
+```{r Utilities 1, echo=TRUE}
+str(list_rep(darr1, 3))
+```
+
+### Bind Operations
+
+`modebind_list` collapses multiple `r Biocpkg("DelayedArray")` objects
+into single `r Biocpkg("DelayedArray")` object.
+
+`m` specifies the collapsed dimension.
+
+![Figure 10: Bind Operations](Figure2_10.png)
+
+```{r Utilities 2, echo=TRUE}
+dim(modebind_list(list(darr1, darr2), m=1))
+dim(modebind_list(list(darr1, darr2), m=2))
+dim(modebind_list(list(darr1, darr2), m=3))
+```
+
+`rbind_list` is the row-wise `modebind_list` and
+collapses multiple 2D `r Biocpkg("DelayedArray")` objects
+into single `r Biocpkg("DelayedArray")` object.
+
+```{r Utilities 3, echo=TRUE}
+dim(rbind_list(list(darr1[,,1], darr2[,,1])))
+```
+
+`cbind_list` is the column-wise `modebind_list` and
+collapses multiple 2D `r Biocpkg("DelayedArray")` objects
+into single `r Biocpkg("DelayedArray")` object.
+
+```{r Utilities 4, echo=TRUE}
+dim(cbind_list(list(darr1[,,1], darr2[,,1])))
+```
+
+# Session information {.unnumbered}
+
+```{r sessionInfo, echo=FALSE}
+sessionInfo()
+```

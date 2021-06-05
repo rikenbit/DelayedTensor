@@ -203,5 +203,17 @@ np.einsum('ijk,ijkl->klj', arrE, arrG)
 np.einsum('ijk,ijkl->ljk', arrE, arrG)
 np.einsum('ijk,ijkl->lkj', arrE, arrG)
 
+
+arr1 = np.array(
+	[[1,3,5],
+	[2,4,6]])
+arr2 = np.array(
+	[[20,16,12,8,4],
+	[19,15,11,7,3],
+	[18,14,10,6,2],
+	[17,13,9,5,1]])
+np.kron(arr1, arr2)
+np.einsum('ij,kl->ikjl', arr1, arr2).reshape(8,15)
+
 # Ref
 # https://ajcr.net/Basic-guide-to-einsum/

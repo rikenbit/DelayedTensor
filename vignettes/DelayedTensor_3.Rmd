@@ -1,0 +1,158 @@
+---
+title: "3. Tensor decomposition by DelayedTensor"
+author:
+- name: Koki Tsuyuzaki
+  affiliation: Laboratory for Bioinformatics Research,
+    RIKEN Center for Biosystems Dynamics Research
+- name: Itoshi Nikaido
+  affiliation: Laboratory for Bioinformatics Research,
+    RIKEN Center for Biosystems Dynamics Research
+  email: k.t.the-answer@hotmail.co.jp
+graphics: no
+package: DelayedTensor
+output:
+  BiocStyle::html_document:
+    toc_float: true
+vignette: |
+  %\VignetteIndexEntry{TensorDecomposition}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r style, echo = FALSE, results = 'asis', message=FALSE}
+BiocStyle::markdown()
+```
+
+**Authors**: `r packageDescription("DelayedTensor")[["Author"]] `<br />
+**Last modified:** `r file.info("DelayedTensor_3.Rmd")$mtime`<br />
+**Compiled**: `r date()`
+
+# Setting
+```{r Setting, echo=TRUE}
+suppressPackageStartupMessages(library("DelayedTensor"))
+suppressPackageStartupMessages(library("DelayedArray"))
+suppressPackageStartupMessages(library("DelayedRandomArray"))
+
+darr <- RandomUnifArray(c(2,3,4))
+
+setVerbose(FALSE)
+setSparse(FALSE)
+setAutoBlockSize(1E+8)
+```
+
+# Tensor Decomposition
+
+Tensor decomposition models decompose multiple factor matrices and core tensor.
+Each factor matrix means the patterns of each mode
+and used for the visualization and the down-stream analysis.
+Core tensor means the intensity of the patterns
+and used to decide which patterns are informative.
+
+We reimplemented some of the tensor decomposition functions of
+`r CRANpkg("rTensor")` using block processing of
+`r Biocpkg("DelayedArray")`.
+
+Only tensor decomposition algorithms and utility functions that require
+Fast Fourier Transform (e.g., `t_mult`, `t_svd`, and `t_svd_reconstruct`)
+are exceptions and have not yet been implemented in `r Biocpkg("DelayedArray")`
+because we are still investigating how to calculate them with
+out-of-core manner.
+
+## Tucker Decomposition
+
+Suppose a tensor $\mathcal{X} \in \Re^{I \times J \times K}$.
+Tucker decomposition models decomposes a tensor $\mathcal{X}$ into a core tensor
+$\mathcal{G} \in \Re^{p \times q \times r}$,
+and multiple factor matrices $A \in \Re^{I \times p}$,
+$B \in \Re^{J \times q}$, and $C \in \Re^{K \times r}$
+($p \leq I, q \leq J, \textrm{and}\ r \leq K$).
+
+$$
+\mathcal{X} = \mathcal{G} \times_{1} A \times_{2} B \times_{3} C
+$$
+
+For simplicity, here we will use a third-order tensor
+but the Tucker decomposition can be applied to tensors of larger orders.
+
+There are well-known two algorithms;
+Higher-Order Singular Value Decomposition (HOSVD) and
+Higher-order Orthogonal Iteration (HOOI).
+
+`hosvd` performs the HOSVD Tucker decomposition
+and `tucker` performs HOOI Tucker decomposition.
+
+For the details, check the `hosvd` and `tucker` functions of
+`r CRANpkg("rTensor")`.
+
+```{r Tensor Decomposition 1, echo=TRUE}
+out_hosvd <- hosvd(darr, ranks=c(2,1,3))
+str(out_hosvd)
+out_tucker <- tucker(darr, ranks=c(2,3,2))
+str(out_tucker)
+```
+
+## CANDECOMP/PARAFAC (CP) Decomposition
+
+Suppose a tensor $\mathcal{X} \in \Re^{I \times J \times K}$.
+CP decomposition models decomposes a tensor $X$ into a core diagonal tensor
+$\mathcal{G} \in \Re^{r \times r \times r}$,
+and multiple factor matrices $A \in \Re^{I \times r}$,
+$B \in \Re^{J \times r}$, and $C \in \Re^{K \times r}$
+($r \leq \min{\left(I,J,K\right)}$).
+
+$$
+\mathcal{X} = \mathcal{G} \times_{1} A \times_{2} B \times_{3} C
+$$
+
+For simplicity, here we will use a third-order tensor
+but the CP decomposition can be applied to tensors of larger orders.
+
+Alternating least squares (ALS) is a well-known algorithm for CP decomposition
+and `cp` performs the ALS CP decomposition.
+
+For the details, check the `cp` function of `r CRANpkg("rTensor")`.
+
+```{r Tensor Decomposition 2, echo=TRUE}
+out_cp <- cp(darr, num_components=2)
+str(out_cp)
+```
+
+## Multilinear Principal Component Analysis (MPCA)
+
+MPCA is a kind of Tucker decompotition and when the order of tensor is 3,
+this is also known as the
+Generalized Low Rank Approximation of Matrices (GLRAM).
+For the details, check the `mpca` function of `r CRANpkg("rTensor")`.
+
+```{r Tensor Decomposition 3, echo=TRUE}
+out_mpca <- mpca
+str(out_mpca)
+```
+
+## Population Value Decomposition (PVD)
+
+Suppose a series of 2D data X_{j}, where $X_{j} \in \Re^{n_{1} \times n_{2}}$,
+and $j = 1, \ldots , n_{3}$.
+PVD models decomposes a tensor $X_{j}$
+into two common factor matrices across all $X_{j}$,
+$P \in \Re^{n_{1} \times r_{1}}$ and $D \in \Re^{n_{2} \times r_{2}}$,
+and a $X_{j}$ specific factor matrix $V_{j} \in \Re^{r_{1} \times r_{2}}$
+($r_{1} \leq n_{1}, \textrm{and}\ r_{2} \leq n_{2}$).
+
+
+$$
+X_{j} = P \times V_{j} \times D
+$$
+
+For the details, check the `pvd` function of `r CRANpkg("rTensor")`.
+
+```{r Tensor Decomposition 4, echo=TRUE}
+out_pvd <- pvd
+str(out_mpca)
+```
+
+# Session information {.unnumbered}
+
+```{r sessionInfo, echo=FALSE}
+sessionInfo()
+```

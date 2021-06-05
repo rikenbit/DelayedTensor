@@ -1,0 +1,438 @@
+---
+title: "4. Einsum operation by DelayedTensor"
+author:
+- name: Koki Tsuyuzaki
+  affiliation: Laboratory for Bioinformatics Research,
+    RIKEN Center for Biosystems Dynamics Research
+- name: Itoshi Nikaido
+  affiliation: Laboratory for Bioinformatics Research,
+    RIKEN Center for Biosystems Dynamics Research
+  email: k.t.the-answer@hotmail.co.jp
+graphics: no
+package: DelayedTensor
+output:
+  BiocStyle::html_document:
+    toc_float: true
+vignette: |
+  %\VignetteIndexEntry{Einsum}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r style, echo = FALSE, results = 'asis', message=FALSE}
+BiocStyle::markdown()
+```
+
+**Authors**: `r packageDescription("DelayedTensor")[["Author"]] `<br />
+**Last modified:** `r file.info("DelayedTensor_4.Rmd")$mtime`<br />
+**Compiled**: `r date()`
+
+# What is `einsum`
+`einsum` is an easy and intuitive way to write tensor operations.
+
+It was originally introduced by
+`Numpy`^[https://numpy.org/doc/stable/reference/generated/numpy.einsum.html]
+package of Python but similar tools have been implemented in other languages
+(e.g. R, Julia) inspired by `Numpy`.
+In this vignette, we willl use CRAN `r CRANpkg("einsum")` package first.
+
+`einsum` is named after
+Einstein summation^[https://en.wikipedia.org/wiki/Einstein_notation]
+introduced by Albert Einstein,
+which is a notational convention that implies summation over
+a set of indexed terms in a formula.
+
+Here, we consider a simple example of `einsum`; *matrix multiplication*.
+If we naively implement the matrix multiplication,
+the calculation would look like the following in a for loop.
+
+```{r Matrix Multiplication 1, echo=TRUE}
+A <- matrix(runif(3*4), nrow=3, ncol=4)
+B <- matrix(runif(4*5), nrow=4, ncol=5)
+C <- matrix(0, nrow=3, ncol=5)
+
+I <- nrow(A)
+J <- ncol(A)
+K <- ncol(B)
+
+for(i in 1:I){
+  for(j in 1:J){
+    for(k in 1:K){
+      C[i,k] = C[i,k] + A[i,j] * B[j,k]
+    }
+  }
+}
+```
+
+Therefore, any programming language can implement this.
+However, when analyzing tensor data,
+such operations tend to be more complicated and increase
+the possibility of causing bugs because the order of tensors is
+larger or more tensors are handled simultaneously.
+In addition, several programming languages, especially R,
+are known to significantly slow down the speed of computation
+if the code is written in for loop.
+
+Obviously, in the case of the R language,
+it should be executed using the built-in matrix multiplication function
+(%\*%) prepared by the R, as shown below.
+
+```{r Matrix Multiplication 2, echo=TRUE}
+C = A %*% B
+```
+
+However, more complex operations than matrix multiplication
+are not always provided by programming languages as standard.
+
+`einsum` is a function that solves such a problem.
+To put it simply, `einsum` is a wrapper for the for loop above.
+Like the Einstein summation, it omits many notations such as for,
+array size (e.g. I, J, and K), brackets (e.g. {}, (), and []),
+and even addition operator (+) and
+extracts the array subscripts (e.g. i, j, and k)
+to concisely express the tensor operation as follows.
+
+```{r Matrix Multiplication 3, echo=TRUE}
+suppressPackageStartupMessages(library("einsum"))
+C <- einsum('ij,jk->ik', A, B)
+```
+
+# Einsum of `DelayedTensor`
+
+CRAN `r CRANpkg("einsum")` is easy to use because the syntax is almost
+the same as that of `Numpy`'s `einsum`,
+except that it prohibits the implicit modes that do not use '->'.
+It is extreamly fast because the internal calculation
+is actually performed by C++.
+When the input tensor is huge, however,
+it is not scalable because it assumes that the input is R's standard array.
+
+Using `einsum` of `r Biocpkg("DelayedTensor")`,
+we can augment the CRAN `einsum`'s functionality;
+in `r Biocpkg("DelayedTensor")`,
+the input `r Biocpkg("DelayedArray")` objects are divided into
+multiple block tensors and the CRAN `r CRANpkg("einsum")`
+is incremently applied in the block processing.
+
+# Typical operations of einsum
+
+A surprisingly large number of tensor operations can be handled
+uniformly in `einsum`.
+
+In more detail, `einsum` is capable of performing any tensor operation
+that can be described by a combination of the following
+three operations^[https://ajcr.net/Basic-guide-to-einsum/].
+
+1. **Multiplication**: the element values of the tensors on the left side
+of -> are multiplied by each other
+2. **Summation**: when comparing the left and right sides of ->,
+if there is a missing subscript on the right, the summation is done
+in the direction of the subscript
+3. **Permutation**: the subscripts to the right of ->
+can be rearranged in any order
+
+Some typical operations are introduced below.
+Here we use the arrays and `r Biocpkg("DelayedArray")` objects below.
+
+```{r Setting, echo=TRUE}
+suppressPackageStartupMessages(library("DelayedTensor"))
+suppressPackageStartupMessages(library("DelayedArray"))
+
+arrA <- array(runif(3), dim=c(3))
+arrB <- array(runif(3*3), dim=c(3,3))
+arrC <- array(runif(3*4), dim=c(3,4))
+arrD <- array(runif(3*3*3), dim=c(3,3,3))
+arrE <- array(runif(3*4*5), dim=c(3,4,5))
+
+darrA <- DelayedArray(arrA)
+darrB <- DelayedArray(arrB)
+darrC <- DelayedArray(arrC)
+darrD <- DelayedArray(arrD)
+darrE <- DelayedArray(arrE)
+```
+
+## No Operation
+### print, show
+
+If the same subscript is written on both sides of ->,
+`einsum` will simply output the object without any calculation.
+
+```{r Print 1, echo=TRUE}
+einsum::einsum('i->i', arrA)
+DelayedTensor::einsum('i->i', darrA)
+```
+
+```{r Print 2, echo=TRUE}
+einsum::einsum('ij->ij', arrC)
+DelayedTensor::einsum('ij->ij', darrC)
+```
+
+```{r Print 3, echo=TRUE}
+einsum::einsum('ijk->ijk', arrE)
+DelayedTensor::einsum('ijk->ijk', darrE)
+```
+
+### diag
+
+We can also extract the diagonal elements as follows.
+
+```{r Diag 1, echo=TRUE}
+einsum::einsum('ii->i', arrB)
+DelayedTensor::einsum('ii->i', darrB)
+```
+
+```{r Diag 2, echo=TRUE}
+einsum::einsum('iii->i', arrD)
+DelayedTensor::einsum('iii->i', darrD)
+```
+
+## Multiplication
+
+By using multiple array or `r Biocpkg("DelayedArray")` object as input and
+writing "," on the right side of ->,
+multiplication will be performed.
+
+### Hadamard Product
+
+Hadamard Product can also be implemented in `einsum`,
+multiplying by the product of each element.
+
+```{r Hadamard Product 1, echo=TRUE}
+einsum::einsum('i,i->i', arrA, arrA)
+DelayedTensor::einsum('i,i->i', darrA, darrA)
+```
+
+```{r Hadamard Product 2, echo=TRUE}
+einsum::einsum('ij,ij->ij', arrC, arrC)
+DelayedTensor::einsum('ij,ij->ij', darrC, darrC)
+```
+
+```{r Hadamard Product 3, echo=TRUE}
+einsum::einsum('ijk,ijk->ijk', arrE, arrE)
+DelayedTensor::einsum('ijk,ijk->ijk', darrE, darrE)
+```
+
+### Outer Product
+
+Outer product can also be implemented in `einsum`,
+in which the subscripts in the input array are all different,
+and all of them are kept.
+
+```{r Outer Product 1, echo=TRUE}
+einsum::einsum('i,j->ij', arrA, arrA)
+DelayedTensor::einsum('i,j->ij', darrA, darrA)
+```
+
+```{r Outer Product 2, echo=TRUE}
+einsum::einsum('ij,klm->ijklm', arrC, arrE)
+DelayedTensor::einsum('ij,klm->ijklm', darrC, darrE)
+```
+
+## Summation
+
+If there is a vanishing subscript on the left or right side of ->,
+the summation is done for that subscript.
+
+```{r Summation 1, echo=TRUE}
+einsum::einsum('i->', arrA)
+DelayedTensor::einsum('i->', darrA)
+```
+
+```{r Summation 2, echo=TRUE}
+einsum::einsum('ij->', arrC)
+DelayedTensor::einsum('ij->', darrC)
+```
+
+```{r Summation 3, echo=TRUE}
+einsum::einsum('ijk->', arrE)
+DelayedTensor::einsum('ijk->', darrE)
+```
+
+### Row-wise / Column-wise Summation
+
+```{r rowSums, echo=TRUE}
+einsum::einsum('ij->i', arrC)
+DelayedTensor::einsum('ij->i', darrC)
+```
+
+```{r colSums, echo=TRUE}
+einsum::einsum('ij->j', arrC)
+DelayedTensor::einsum('ij->j', darrC)
+```
+
+### Mode-wise Vectorization
+```{r Summation in each Mode 1, echo=TRUE}
+einsum::einsum('ijk->i', arrE)
+DelayedTensor::einsum('ijk->i', darrE)
+```
+
+```{r Summation in each Mode 2, echo=TRUE}
+einsum::einsum('ijk->j', arrE)
+DelayedTensor::einsum('ijk->j', darrE)
+```
+
+```{r Summation in each Mode 3, echo=TRUE}
+einsum::einsum('ijk->k', arrE)
+DelayedTensor::einsum('ijk->k', darrE)
+```
+
+### Mode-wise Summation
+
+These are the same as what `modeSum` function does.
+
+```{r Mode Sum 1, echo=TRUE}
+einsum::einsum('ijk->ij', arrE)
+DelayedTensor::einsum('ijk->ij', darrE)
+```
+
+```{r Mode Sum 2, echo=TRUE}
+einsum::einsum('ijk->jk', arrE)
+DelayedTensor::einsum('ijk->jk', darrE)
+```
+
+```{r Mode Sum 3, echo=TRUE}
+einsum::einsum('ijk->jk', arrE)
+DelayedTensor::einsum('ijk->jk', darrE)
+```
+
+### Trace
+
+If we take the diagonal elements of a matrix
+and add them together, we get `trace`.
+
+```{r Trace, echo=TRUE}
+einsum::einsum('ii->', arrB)
+DelayedTensor::einsum('ii->', darrB)
+```
+
+## Permutation
+
+By changing the order of the indices on the left and right side of ->,
+we can get a sorted array or `r Biocpkg("DelayedArray")`.
+
+```{r Permutation 1, echo=TRUE}
+einsum::einsum('ij->ji', arrB)
+DelayedTensor::einsum('ij->ji', darrB)
+```
+
+```{r Permutation 2, echo=TRUE}
+einsum::einsum('ijk->jki', arrD)
+DelayedTensor::einsum('ijk->jki', darrD)
+```
+
+## Multiplication + Summation
+
+Some examples of combining Multiplication and Summation is shown below.
+
+### Inner Product (Squared Frobenius Norm)
+
+Inner Product first calculate Hadamard Product and collapses it to
+0D tensor (norm).
+
+```{r Inner Product 1, echo=TRUE}
+einsum::einsum('i,i->', arrA, arrA)
+DelayedTensor::einsum('i,i->', darrA, darrA)
+```
+
+```{r Inner Product 2, echo=TRUE}
+einsum::einsum('ij,ij->', arrC, arrC)
+DelayedTensor::einsum('ij,ij->', darrC, darrC)
+```
+
+```{r Inner Product 3, echo=TRUE}
+einsum::einsum('ijk,ijk->', arrE, arrE)
+DelayedTensor::einsum('ijk,ijk->', darrE, darrE)
+```
+
+### Contracted Product
+
+Inner product is an operation that eliminates all subscripts,
+while outer product is an operation that leaves all subscripts intact.
+In the middle of the two, the operation that eliminates some subscripts
+while keeping others by summing them is called contracted product.
+
+```{r Contracted Product, echo=TRUE}
+einsum::einsum('ijk,ijk->jk', arrE, arrE)
+DelayedTensor::einsum('ijk,ijk->jk', darrE, darrE)
+```
+
+### Matrix Multiplication
+
+Matrix Multiplication is considered as a contracted product.
+
+```{r Matrix Multiplication, echo=TRUE}
+einsum::einsum('ij,jk->ik', arrC, t(arrC))
+DelayedTensor::einsum('ij,jk->ik', darrC, t(darrC))
+```
+
+## Multiplication + Permutation
+
+Some examples of combining Multiplication and Permutation is shown below.
+
+```{r Multiplication and Permutation 1, echo=TRUE}
+einsum::einsum('ij,ij->ji', arrC, arrC)
+DelayedTensor::einsum('ij,ij->ji', darrC, darrC)
+```
+
+```{r Multiplication and Permutation 2, echo=TRUE}
+einsum::einsum('ijk,ijk->jki', arrE, arrE)
+DelayedTensor::einsum('ijk,ijk->jki', darrE, darrE)
+```
+
+## Summation + Permutation
+
+Some examples of combining Summation and Permutation is shown below.
+
+```{r Summation and Permutation, echo=TRUE}
+einsum::einsum('ijk->ki', arrE)
+DelayedTensor::einsum('ijk->ki', darrE)
+```
+
+## Multiplication + Summation + Permutation
+
+Finally, we will show more complex example,
+combining Multiplication, Summation, and Permutation.
+
+```{r Multiplication, Summation, and Permutation, echo=TRUE}
+einsum::einsum('i,ij,ijk,ijk,ji->jki',
+    arrA, arrC, arrE, arrE, t(arrC))
+DelayedTensor::einsum('i,ij,ijk,ijk,ji->jki',
+    darrA, darrC, darrE, darrE, t(darrC))
+```
+
+# Create your original function by `einsum`
+
+By using `einsum` and other `r Biocpkg("DelayedTensor")` functions,
+it is possible to implement your original tensor calculation functions.
+It is intended to be applied to Delayed Arrays,
+which can scale to large-scale data
+since the calculation is performed internally by block processing.
+
+For example, `kronecker` can be easily implmented by `eimsum`
+and other `r Biocpkg("DelayedTensor")` functions^[https://stackoverflow.com/
+questions/56067643/speeding-up-kronecker-products-numpy]
+(the `kronecker` function inside `r Biocpkg("DelayedTensor")`
+has a more efficient implementation though).
+
+```{r Kronecker Function, echo=TRUE}
+darr1 <- DelayedArray(array(runif(3*4), dim=c(3,4)))
+darr2 <- DelayedArray(array(runif(5*6), dim=c(5,6)))
+
+mykronecker <- function(darr1, darr2){
+    stopifnot((length(dim(darr1)) == 2) && (length(dim(darr2)) == 2))
+    # Outer Product
+    tmpdarr <- einsum('ij,kl->iklj', darr1, darr2)
+
+    # Reshape
+    unfold(tmpdarr, row_idx=1:2, col_idx=3:4)
+}
+
+identical(as.array(kronecker(darr1, darr2)),
+    as.array(mykronecker(darr1, darr2)))
+```
+
+# Session information {.unnumbered}
+
+```{r sessionInfo, echo=FALSE}
+sessionInfo()
+```

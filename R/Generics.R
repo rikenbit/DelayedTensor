@@ -291,6 +291,26 @@ setMethod("innerProd", signature(darr1="DelayedArray", darr2="DelayedArray"),
     }
 }
 
+# outerProd
+setGeneric("outerProd",
+    function(darr1, darr2){
+        standardGeneric("outerProd")})
+setMethod("outerProd", signature(darr1="DelayedArray", darr2="DelayedArray"),
+    function(darr1, darr2){
+        .outerProd(darr1, darr2)})
+.outerProd <- function(darr1, darr2){
+    idx_lfs1 <- letters[seq_len(.ndim(darr1))]
+    idx_lfs2 <- letters[.ndim(darr1) + seq_len(.ndim(darr2))]
+    idx_rhs <- c(idx_lfs1, idx_lfs2)
+    cmd <- paste0(
+            paste(idx_lfs1, collapse=""),
+            ",",
+            paste(idx_lfs2, collapse=""),
+            "->",
+            paste(idx_rhs, collapse=""))
+    einsum(cmd, darr1, darr2)
+}
+
 # vec
 setGeneric("vec",
     function(darr){

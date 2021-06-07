@@ -125,7 +125,7 @@ Generalized Low Rank Approximation of Matrices (GLRAM).
 For the details, check the `mpca` function of `r CRANpkg("rTensor")`.
 
 ```{r Tensor Decomposition 3, echo=TRUE}
-out_mpca <- mpca
+out_mpca <- mpca(darr, ranks=c(2,2))
 str(out_mpca)
 ```
 
@@ -147,8 +147,8 @@ $$
 For the details, check the `pvd` function of `r CRANpkg("rTensor")`.
 
 ```{r Tensor Decomposition 4, echo=TRUE}
-out_pvd <- pvd
-str(out_mpca)
+out_pvd <- pvd(darr, uranks=rep(2,5), wranks=rep(3,5), a=2, b=3)
+str(out_pvd)
 ```
 
 # Session information {.unnumbered}

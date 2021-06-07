@@ -266,6 +266,10 @@ setMethod("pvd", signature(darr="DelayedArray"),
     # Argument check
     .checkPVD(uranks, wranks, a, b, darr)
     # Setting
+    uranks <- as.integer(uranks)
+    wranks <- as.integer(wranks)
+    a <- as.integer(a)
+    b <- as.integer(b)
     modes <- dim(darr)
     n <- modes[3]
     pb <- txtProgressBar(min=0, max=(n+3), style=3)

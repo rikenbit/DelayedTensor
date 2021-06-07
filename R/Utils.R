@@ -220,7 +220,7 @@
     if(is.null(ranks)){
         stop("ranks must be specified")
     }
-    if(sum(ranks > dim(darr)) != 0){
+    if(sum(ranks > dim(darr)[1:2]) != 0){
         stop("ranks must be smaller than the corresponding mode")
     }
     if(sum(ranks <= 0) != 0){

@@ -1,18 +1,5 @@
-# What einsum can express is ...
-# 1. multiply: multiplication with common indices among operands
-# 2. sum: Add the multipliers to make a scalar
-#      (-> the missing subscripts from left to right will be added)
-# 3. transpose: Change the order of the output at the end
-#               (sort by the subscript to the right of ->)
-
 import numpy as np
 
-# arrA: 1st order Tensor (Vector)
-# arrB: 1st order Tensor (Vector)
-# arrC: 2nd order Tensor (Matrix)
-# arrD: 2nd order Tensor (Matrix)
-# arrE: 3rd order Tensor
-# arrF: 4th order Tensor
 arrA = np.random.rand(3)
 arrB = np.random.rand(3)
 arrC = np.random.rand(3,3)

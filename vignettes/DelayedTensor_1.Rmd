@@ -111,22 +111,32 @@ and `r Biocpkg("TileDBArray")` used in `r Biocpkg("DelayedArray")`
 and the incremental calculations can be performed
 by implementing the functions in support of "block processing".
 
-Implementing the functions as a block processing-enabled type,
-we have made it possible to perform various tensor operations
-while controlling the maximum number of block array elements (block size)
-that can be placed in memory at one time according to machine specifications.
+The functionality of DelayedTensor is fourfold.
+![Figure 4: Concept of DelayedTensor](Figure1_4.png)
+
+1. **Block-Processing Tensor Reshaping**: Operations such as folding
+and unfolding a higher-order tensor data into a matrix
+can be performed while taking care of the block size.
+
+2. **Block-Processing Tensor Arithmetic**: Calculation of sums and averages
+for each mode, and operations such as Hadamard product, Kronecker product,
+and Khatri-Rao product can be performed while taking care of block size.
+
+3. **Block-Processing Tensor Decomposition**: Some of the tensor decomposition
+algorithms implemented in `r CRANpkg("rTensor")` have been reimplemented using
+reshaping and arithmetic functions of `r Biocpkg("DelayedTensor")`.
+
+4. **Block-Processing einsum**: In addition to the `r CRANpkg("rTensor")`
+functions, the `r CRANpkg("einsum")` function, which is well-known as
+the Numpy (Python) function, has also been reimplemented based on
+`r Biocpkg("DelayedArray")` and the block processing framework.
+`r CRANpkg("einsum")` is a very powerful preprocessing method
+to merge multiple tensor data into a single tensor.
 
 Although what is executed inside the functions are very different,
 the function name, argument name, and value name are exactly the same
 as those of `r CRANpkg("rTensor")`
 so that `r CRANpkg("rTensor")` users can easily introduce them.
-
-In addition to the `r CRANpkg("rTensor")` functions,
-the `r CRANpkg("einsum")` function, which is well-known as
-the Numpy (Python) function, has also been reimplemented based on
-`r Biocpkg("DelayedArray")` and the block processing framework.
-`r CRANpkg("einsum")` is a very powerful preprocessing method
-to merge multiple tensor data into a single tensor.
 
 # Session information {.unnumbered}
 

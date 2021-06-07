@@ -415,16 +415,15 @@ questions/56067643/speeding-up-kronecker-products-numpy]
 has a more efficient implementation though).
 
 ```{r Kronecker Function, echo=TRUE}
-darr1 <- DelayedArray(array(runif(3*4), dim=c(3,4)))
-darr2 <- DelayedArray(array(runif(5*6), dim=c(5,6)))
+darr1 <- DelayedArray(array(1:6, dim=c(2,3)))
+darr2 <- DelayedArray(array(20:1, dim=c(4,5)))
 
 mykronecker <- function(darr1, darr2){
     stopifnot((length(dim(darr1)) == 2) && (length(dim(darr2)) == 2))
     # Outer Product
-    tmpdarr <- einsum('ij,kl->iklj', darr1, darr2)
-
+    tmpdarr <- einsum('ij,kl->ikjl', darr1, darr2)
     # Reshape
-    unfold(tmpdarr, row_idx=1:2, col_idx=3:4)
+    unfold(tmpdarr, row_idx=c(2,1), col_idx=c(4,3))
 }
 
 identical(as.array(kronecker(darr1, darr2)),

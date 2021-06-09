@@ -57,7 +57,7 @@ setMethod("cp", signature(darr="DelayedArray"),
     darr_norm <- fnorm(darr)
     for(m in seq_len(num_modes)){
         unfolded_mat[[m]] <- rs_unfold(darr, m=m)
-        U_list[[m]] <- RandomUnifArray(dim=c(modes[m], num_components))
+        U_list[[m]] <- RandomNormArray(dim=c(modes[m], num_components))
     }
     est <- darr
     curr_iter <- 1
@@ -68,11 +68,10 @@ setMethod("cp", signature(darr="DelayedArray"),
         setTxtProgressBar(pb, curr_iter)
         for(m in seq_len(num_modes)){
             V_inv <- solve(hadamard_list(lapply(U_list[-m], function(x){
-                    x <- as(x, "DelayedMatrix")
                     t(x) %*% x})))
             tmp <- as(khatri_rao_list(U_list[-m],reverse=TRUE), "DelayedMatrix")
             tmp2 <- unfolded_mat[[m]] %*% tmp %*% V_inv
-            lambdas <- apply(tmp2, 2, fnorm)
+            lambdas <- colSums(abs(tmp2))
             U_list[[m]] <- sweep(tmp2, 2, lambdas, "/")
             Z <- DelayedDiagonalArray(
                 rep(num_components, length=num_modes), lambdas)
@@ -283,16 +282,13 @@ setMethod("pvd", signature(darr="DelayedArray"),
         S[[i]] <- svdz$d[seq_len(min(uranks[i], wranks[i]))]
         setTxtProgressBar(pb, i)
     }
-    # cbind
     U <- cbind_list(Us)
-    U <- list_rep(U, sum(uranks)*n/ncol(U))
-    U <- as(cbind_list(U), "DelayedMatrix")
-    P <- DelayedArray(.svd(U %*% t(U), k=a)$u)
+    U <- as(cbind_list(list_rep(U, sum(uranks)*n/ncol(U))), "DelayedMatrix")
+    UtU <- as(U %*% t(U), "DelayedMatrix")
+    P <- DelayedArray(.svd(UtU, k=a)$u)
     setTxtProgressBar(pb, n+1)
-    # cbind
     V <- cbind_list(Vs)
-    V <- list_rep(V, sum(wranks)*n/ncol(V))
-    V <- as(cbind_list(V), "DelayedMatrix")
+    V <- as(cbind_list(list_rep(V, sum(wranks)*n/ncol(V))), "DelayedMatrix")
     Dt <- DelayedArray(.svd(V %*% t(V), k=b)$u)
     D <- t(Dt)
     setTxtProgressBar(pb, n+2)
@@ -301,9 +297,8 @@ setMethod("pvd", signature(darr="DelayedArray"),
     for(i in seq_len(n)){
         diagS <- DelayedDiagonalArray(c(uranks[i], wranks[i]), S[[i]])
         diagS <- as(diagS, "DelayedMatrix")
-        V2[[i]] <- (t(P) %*% Us[[i]]) %*% diagS %*%
-            (t(Vs[[i]]) %*% Dt)
-        V2[[i]] <- .realize_and_return(V2[[i]])
+        V2[[i]] <- .realize_and_return((t(P) %*% Us[[i]]) %*% diagS %*%
+            (t(Vs[[i]]) %*% Dt))
         V2[[i]] <- as(V2[[i]], "DelayedMatrix")
         est[,,i] <- as.array(P %*% V2[[i]] %*% D)
     }

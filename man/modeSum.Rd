@@ -27,6 +27,8 @@ summing across that particular mode.
 This function is an extension of the \code{\link[rTensor]{modeSum}}
 by DelayedArray.
 
+NOTE: Sparse mode of modeSum is not available for now.
+
 \code{modeSum(darr, m=NULL, drop=FALSE)}
 }
 \examples{

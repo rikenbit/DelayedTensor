@@ -27,6 +27,8 @@ taking the mean across that particular mode.
 This function is an extension of the \code{\link[rTensor]{modeMean}}
 by DelayedArray.
 
+NOTE: Sparse mode of modeMean is not available for now.
+
 \code{modeMean(darr, m=NULL, drop=FALSE)}
 }
 \examples{

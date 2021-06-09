@@ -24,16 +24,7 @@ modebind_list <- function(L, m=NULL){
         ")")
     eval(parse(text=cmd))
     Lvec <- .realize_and_return(Lvec)
-    if(getSparse()$delayedtensor.sparse){
-        Lvec <- .reshapeIncNumbers1DSparse(Lvec, new_modes)
-    }else{
-        Lvec <- .reshapeIncNumbers1D(Lvec, new_modes)
-        # Reshaping
-        # This part might be implemented by ReshapedHDF5Array in near future
-        # tmpfile <- tempfile()
-        # writeHDF5Array(Lvec, filepath=tmpfile, name="tmp", as.sparse=TRUE)
-        # sink <- ReshapedHDF5Array(tmpfile, "tmp", new_modes)
-    }
+    Lvec <- .reshapeIncNumbers1D(Lvec, new_modes)
     .realize_and_return(Lvec)
 }
 
@@ -138,7 +129,7 @@ DelayedDiagonalArray <- function(shape, value){
         value <- rep(1L, num_modes)
     }
     out <- SparseArraySeed(shape)
-    out@nzdata <- value
+    out@nzdata <- as.vector(value)
     out@nzindex <-  t(vapply(seq_len(min.s),
         function(x){rep(x, num_modes)}, rep(1L, num_modes)))
     DelayedArray(out)

@@ -54,7 +54,7 @@ Here, we specify `as.sparse` as `FALSE`
 (this is also the default value for now).
 
 ```{r Setting 2, echo=TRUE}
-setSparse(as.sparse=FALSE)
+DelayedTensor::setSparse(as.sparse=FALSE)
 ```
 
 Next, the verbose message is suppressed by `setVerbose`.
@@ -64,7 +64,7 @@ Here we specify `as.verbose` as `FALSE`
 (this is also the default value for now).
 
 ```{r Setting 3, echo=TRUE}
-setVerbose(as.verbose=FALSE)
+DelayedTensor::setVerbose(as.verbose=FALSE)
 ```
 
 Finally, the block size of block processing is specified by `setAutoBlockSize`.
@@ -82,8 +82,8 @@ setAutoBlockSize(size=1E+8)
 These specified values are also extracted by each getter function.
 
 ```{r Setting 5, echo=TRUE}
-getSparse()
-getVerbose()
+DelayedTensor::getSparse()
+DelayedTensor::getVerbose()
 getAutoBlockSize()
 ```
 
@@ -99,7 +99,7 @@ In `unfold`, `row_idx`/`col_idx` are specified to set which modes are used
 as the row/column.
 
 ```{r Unfold/Fold operations 1, echo=TRUE}
-dmat1 <- unfold(darr1, row_idx=c(1,2), col_idx=3)
+dmat1 <- DelayedTensor::unfold(darr1, row_idx=c(1,2), col_idx=3)
 dmat1
 ```
 
@@ -125,15 +125,15 @@ are is used as the column.
 `k_fold` is the inverse operation of `k_unfold`.
 
 ```{r Unfold/Fold operations 3, echo=TRUE}
-dmat2 <- k_unfold(darr1, m=1)
+dmat2 <- DelayedTensor::k_unfold(darr1, m=1)
 dmat2_to_darr1 <- k_fold(dmat2, m=1, modes=dim(darr1))
 identical(as.array(darr1), as.array(dmat2_to_darr1))
 
-dmat3 <- k_unfold(darr1, m=2)
+dmat3 <- DelayedTensor::k_unfold(darr1, m=2)
 dmat3_to_darr1 <- k_fold(dmat3, m=2, modes=dim(darr1))
 identical(as.array(darr1), as.array(dmat3_to_darr1))
 
-dmat4 <- k_unfold(darr1, m=3)
+dmat4 <- DelayedTensor::k_unfold(darr1, m=3)
 dmat4_to_darr1 <- k_fold(dmat4, m=3, modes=dim(darr1))
 identical(as.array(darr1), as.array(dmat4_to_darr1))
 ```
@@ -149,16 +149,16 @@ and the other modes are specified as the column.
 `cs_fold` is the inverse operation of `cs_unfold`.
 
 ```{r Unfold/Fold operations 4, echo=TRUE}
-dmat8 <- cs_unfold(darr1, m=1)
-dmat8_to_darr1 <- cs_fold(dmat8, m=1, modes=dim(darr1))
+dmat8 <- DelayedTensor::cs_unfold(darr1, m=1)
+dmat8_to_darr1 <- DelayedTensor::cs_fold(dmat8, m=1, modes=dim(darr1))
 identical(as.array(darr1), as.array(dmat8_to_darr1))
 
-dmat9 <- cs_unfold(darr1, m=2)
-dmat9_to_darr1 <- cs_fold(dmat9, m=2, modes=dim(darr1))
+dmat9 <- DelayedTensor::cs_unfold(darr1, m=2)
+dmat9_to_darr1 <- DelayedTensor::cs_fold(dmat9, m=2, modes=dim(darr1))
 identical(as.array(darr1), as.array(dmat9_to_darr1))
 
-dmat10 <- cs_unfold(darr1, m=3)
-dmat10_to_darr1 <- cs_fold(dmat10, m=3, modes=dim(darr1))
+dmat10 <- DelayedTensor::cs_unfold(darr1, m=3)
+dmat10_to_darr1 <- DelayedTensor::cs_fold(dmat10, m=3, modes=dim(darr1))
 identical(as.array(darr1), as.array(dmat10_to_darr1))
 ```
 
@@ -167,8 +167,8 @@ In `matvec`, m=2 is specified as unfold.
 `unmatvec` is the inverse operation of `matvec`.
 
 ```{r Unfold/Fold operations 5, echo=TRUE}
-dmat11 <- matvec(darr1)
-dmat11_darr1 <- unmatvec(dmat11, modes=dim(darr1))
+dmat11 <- DelayedTensor::matvec(darr1)
+dmat11_darr1 <- DelayedTensor::unmatvec(dmat11, modes=dim(darr1))
 identical(as.array(darr1), as.array(dmat11_darr1))
 ```
 
@@ -178,7 +178,7 @@ identical(as.array(darr1), as.array(dmat11_darr1))
 
 ```{r Unfold/Fold operations 7, echo=TRUE}
 dmatZ <- RandomUnifArray(c(10,4))
-ttm(darr1, dmatZ, m=3)
+DelayedTensor::ttm(darr1, dmatZ, m=3)
 ```
 
 `ttl` multiplies a tensor by multiple matrices.
@@ -189,7 +189,7 @@ ttm(darr1, dmatZ, m=3)
 dmatX <- RandomUnifArray(c(10,2))
 dmatY <- RandomUnifArray(c(10,3))
 dlizt <- list(dmatX = dmatX, dmatY = dmatY)
-ttl(darr1, dlizt, ms=c(1,2))
+DelayedTensor::ttl(darr1, dlizt, ms=c(1,2))
 ```
 
 ## Vectorization
@@ -200,7 +200,7 @@ a 1D `r Biocpkg("DelayedArray")` (vector).
 ![Figure 2: Vectorization](Figure2_2.png)
 
 ```{r Vectorization, echo=TRUE}
-vec(darr1)
+DelayedTensor::vec(darr1)
 ```
 
 ## Norm Operations
@@ -210,14 +210,14 @@ vec(darr1)
 ![Figure 3: Norm Operations](Figure2_3.png)
 
 ```{r Norm operations 1, echo=TRUE}
-fnorm(darr1)
+DelayedTensor::fnorm(darr1)
 ```
 
 `innerProd` calculates the inner product value of two
 `r Biocpkg("DelayedArray")`.
 
 ```{r Norm operations 2, echo=TRUE}
-innerProd(darr1, darr2)
+DelayedTensor::innerProd(darr1, darr2)
 ```
 
 ## Outer Product
@@ -228,7 +228,7 @@ On the hand, outer product is an operation that leaves all subscripts intact.
 ![Figure 4: Outer Product](Figure2_4.png)
 
 ```{r Outer Product, echo=TRUE}
-outerProd(darr1[,,1], darr2[,,1])
+DelayedTensor::outerProd(darr1[,,1], darr2[,,1])
 ```
 
 ## Diagonal Operations
@@ -239,7 +239,7 @@ Using `DelayedDiagonalArray`, we can originally create a diagonal
 ![Figure 5: Diagonal Operations](Figure2_5.png)
 
 ```{r Diagonal operations 1, echo=TRUE}
-dgdarr <- DelayedDiagonalArray(c(5,6,7), 1:5)
+dgdarr <- DelayedTensor::DelayedDiagonalArray(c(5,6,7), 1:5)
 dgdarr
 ```
 
@@ -265,18 +265,18 @@ The mode specified as `m` is collapsed into 1D as follows.
 ![Figure 6: Mode-wise Operations](Figure2_6.png)
 
 ```{r Mode-wise operations 1, echo=TRUE}
-modeSum(darr1, m=1)
-modeSum(darr1, m=2)
-modeSum(darr1, m=3)
+DelayedTensor::modeSum(darr1, m=1)
+DelayedTensor::modeSum(darr1, m=2)
+DelayedTensor::modeSum(darr1, m=3)
 ```
 
 Similar to `modeSum`, `modeMean` calculates the average value
 for a given mode `m` of a `r Biocpkg("DelayedArray")`.
 
 ```{r Mode-wise operations 2, echo=TRUE}
-modeMean(darr1, m=1)
-modeMean(darr1, m=2)
-modeMean(darr1, m=3)
+DelayedTensor::modeMean(darr1, m=1)
+DelayedTensor::modeMean(darr1, m=2)
+DelayedTensor::modeMean(darr1, m=3)
 ```
 
 ## Tensor Product Operations
@@ -308,7 +308,7 @@ $$
 objects.
 
 ```{r Tensor product operations 1, echo=TRUE}
-prod_h <- hadamard(darr1, darr2)
+prod_h <- DelayedTensor::hadamard(darr1, darr2)
 dim(prod_h)
 ```
 
@@ -316,7 +316,7 @@ dim(prod_h)
 `r Biocpkg("DelayedArray")` objects.
 
 ```{r Tensor product operations 2, echo=TRUE}
-prod_hl <- hadamard_list(list(darr1, darr2))
+prod_hl <- DelayedTensor::hadamard_list(list(darr1, darr2))
 dim(prod_hl)
 ```
 
@@ -345,7 +345,7 @@ $$
 objects.
 
 ```{r Tensor product operations 3, echo=TRUE}
-prod_kron <- kronecker(darr1, darr2)
+prod_kron <- DelayedTensor::kronecker(darr1, darr2)
 dim(prod_kron)
 ```
 
@@ -353,7 +353,7 @@ dim(prod_kron)
 `r Biocpkg("DelayedArray")` objects.
 
 ```{r Tensor product operations 4, echo=TRUE}
-prod_kronl <- kronecker_list(list(darr1, darr2))
+prod_kronl <- DelayedTensor::kronecker_list(list(darr1, darr2))
 dim(prod_kronl)
 ```
 
@@ -379,7 +379,7 @@ Khatri-Rao product can only be used for 2D tensors (matrices).
 objects.
 
 ```{r Tensor product operations 5, echo=TRUE}
-prod_kr <- khatri_rao(darr1[,,1], darr2[,,1])
+prod_kr <- DelayedTensor::khatri_rao(darr1[,,1], darr2[,,1])
 dim(prod_kr)
 ```
 
@@ -387,7 +387,7 @@ dim(prod_kr)
 `r Biocpkg("DelayedArray")` objects.
 
 ```{r Tensor product operations 6, echo=TRUE}
-prod_krl <- khatri_rao_list(list(darr1[,,1], darr2[,,1]))
+prod_krl <- DelayedTensor::khatri_rao_list(list(darr1[,,1], darr2[,,1]))
 dim(prod_krl)
 ```
 
@@ -396,7 +396,7 @@ dim(prod_krl)
 `list_rep` replicates an arbitrary number of any R object.
 
 ```{r Utilities 1, echo=TRUE}
-str(list_rep(darr1, 3))
+str(DelayedTensor::list_rep(darr1, 3))
 ```
 
 ### Bind Operations
@@ -409,9 +409,9 @@ into single `r Biocpkg("DelayedArray")` object.
 ![Figure 10: Bind Operations](Figure2_10.png)
 
 ```{r Utilities 2, echo=TRUE}
-dim(modebind_list(list(darr1, darr2), m=1))
-dim(modebind_list(list(darr1, darr2), m=2))
-dim(modebind_list(list(darr1, darr2), m=3))
+dim(DelayedTensor::modebind_list(list(darr1, darr2), m=1))
+dim(DelayedTensor::modebind_list(list(darr1, darr2), m=2))
+dim(DelayedTensor::modebind_list(list(darr1, darr2), m=3))
 ```
 
 `rbind_list` is the row-wise `modebind_list` and
@@ -419,7 +419,7 @@ collapses multiple 2D `r Biocpkg("DelayedArray")` objects
 into single `r Biocpkg("DelayedArray")` object.
 
 ```{r Utilities 3, echo=TRUE}
-dim(rbind_list(list(darr1[,,1], darr2[,,1])))
+dim(DelayedTensor::rbind_list(list(darr1[,,1], darr2[,,1])))
 ```
 
 `cbind_list` is the column-wise `modebind_list` and
@@ -427,7 +427,7 @@ collapses multiple 2D `r Biocpkg("DelayedArray")` objects
 into single `r Biocpkg("DelayedArray")` object.
 
 ```{r Utilities 4, echo=TRUE}
-dim(cbind_list(list(darr1[,,1], darr2[,,1])))
+dim(DelayedTensor::cbind_list(list(darr1[,,1], darr2[,,1])))
 ```
 
 # Session information {.unnumbered}

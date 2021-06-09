@@ -7,22 +7,10 @@
 }
 
 # for fold, unfold, and modebind_list
-.reshapeIncNumbers1DSparse <- function(vecobj, new_modes){
-    out <- SparseArraySeed(new_modes)
-    target <- which(vecobj != 0)
-    if(length(target) == 0){
-        .array(new_modes)
-    }else{
-        out@nzindex <- Lindex2Mindex(target, new_modes)
-        out@nzdata <- as.integer(vecobj[target])
-        DelayedArray(out)
-    }
-}
-
-# for fold, unfold, and modebind_list
 .reshapeIncNumbers1D <- function(vecobj, new_modes){
     # Setting
     block.size <- getAutoBlockSize()
+    dim(vecobj) <- c(dim(vecobj), 1) # Fake dimension
     num_modes <- length(new_modes)
     # Block Size Scheduling
     sink_spacings <- .blockSizeScheduling4(new_modes, num_modes, block.size)
@@ -32,8 +20,10 @@
         spacings=sink_spacings)
     # Block Size Scheduling
     # e.g. 18 => [9], [9]
-    tickmarks <- unlist(lapply(sink_grid, function(x){prod(dim(x))}))
-    tickmarks <- list(as.integer(cumsum(tickmarks)))
+    tickmarks <- unlist(lapply(sink_grid, function(x){
+        prod(dim(x))
+    }))
+    tickmarks <- list(as.integer(cumsum(tickmarks)), 1L)
     vec_grid <- ArbitraryArrayGrid(tickmarks = tickmarks)
     # Check
     .checkLimit(sink_grid, block.size)
@@ -44,21 +34,28 @@
     sink <- AutoRealizationSink(new_modes)
     FUN <- function(sink_viewport, sink) {
         bid <- currentBlockId()
-        block <- .block_reshape(
-                    read_block(vecobj, vec_grid[[bid]]),
-                    dim(sink_viewport))
+        block <- .block_reshape(vecobj, vec_grid, bid, sink_viewport)
         write_block(sink, sink_viewport, block)
     }
     sink <- gridReduce(FUN, sink_grid, sink,
-        verbose=getVerbose()$delayedtensor.verbose)
+        verbose=options()$delayedtensor.verbose)
     close(sink)
     as(sink, "DelayedArray")
 }
 
-.block_reshape <- function(x, dim){
-    out <- array(0, dim)
-    out[] <- as.vector(x)
-    out
+.block_reshape <- function(vecobj, vec_grid, bid, sink_viewport){
+    dim_sink_viewport <- as.integer(dim(sink_viewport))
+    if(options()$delayedtensor.sparse){
+        v <- read_block(vecobj, vec_grid[[bid]], as.sparse=TRUE)
+        out <- SparseArraySeed(dim_sink_viewport)
+        out@nzdata <- v@nzdata
+        out@nzindex <- Lindex2Mindex(v@nzindex[,1], dim_sink_viewport)
+        sparse2dense(out)
+    }else{
+        v <- read_block(vecobj, vec_grid[[bid]], as.sparse=FALSE)
+        dim(v) <- dim_sink_viewport
+        v
+    }
 }
 
 # Block Size Scheduling
@@ -220,7 +217,7 @@
     if(is.null(ranks)){
         stop("ranks must be specified")
     }
-    if(sum(ranks > dim(darr)[1:2]) != 0){
+    if(sum(ranks > dim(darr)[seq(2)]) != 0){
         stop("ranks must be smaller than the corresponding mode")
     }
     if(sum(ranks <= 0) != 0){

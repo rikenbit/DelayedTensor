@@ -33,7 +33,7 @@ suppressPackageStartupMessages(library("DelayedTensor"))
 suppressPackageStartupMessages(library("DelayedArray"))
 suppressPackageStartupMessages(library("DelayedRandomArray"))
 
-darr <- RandomUnifArray(c(2,3,4))
+darr <- RandomUnifArray(c(3,4,5))
 
 setVerbose(FALSE)
 setSparse(FALSE)
@@ -147,7 +147,8 @@ $$
 For the details, check the `pvd` function of `r CRANpkg("rTensor")`.
 
 ```{r Tensor Decomposition 4, echo=TRUE}
-out_pvd <- pvd(darr, uranks=rep(2,5), wranks=rep(3,5), a=2, b=3)
+out_pvd <- pvd(darr,
+  uranks=rep(2,dim(darr)[3]), wranks=rep(3,dim(darr)[3]), a=2, b=3)
 str(out_pvd)
 ```
 

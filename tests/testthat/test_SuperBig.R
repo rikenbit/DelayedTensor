@@ -1,8 +1,11 @@
-darr_human_mini <- DelayedArray(as.array(human_mid_brain[1:10, 1:10]))
-darr_mouse_mini <- DelayedArray(as.array(mouse_mid_brain[1:10, 1:10]))
-
+# Setting
 setVerbose(TRUE)
 setAutoBlockSize(size=1E+8)
+
+# darr_human_mini <- DelayedArray(as.array(human_mid_brain[1:100, ]))
+# darr_mouse_mini <- DelayedArray(as.array(mouse_mid_brain[1:100, ]))
+darr_human_mini <- DelayedArray(as.array(human_mid_brain[1:20, 1:20]))
+darr_mouse_mini <- DelayedArray(as.array(mouse_mid_brain[1:20, 1:20]))
 
 # einsum
 # .block_einsum/einsum::einsum (52.50%)
@@ -36,24 +39,6 @@ Rprof(NULL)
 prof_vec_sparse <- summaryRprof()
 save(prof_vec_sparse, file="prof_vec_sparse.RData")
 
-# .reshapeIncNumbers1D
-# XXXXXX (XX.XX%)
-print(".reshapeIncNumbers1D")
-Rprof()
-try(DelayedTensor:::.reshapeIncNumbers1D(v, as.integer(prod(dim(darr)))))
-Rprof(NULL)
-prof_reshape1D_dense <- summaryRprof()
-save(prof_reshape1D_dense, file="prof_reshape1D_dense.RData")
-
-# .reshapeIncNumbers1DSparse
-# read_block (84.49%)
-print(".reshapeIncNumbers1DSparse")
-Rprof()
-try(DelayedTensor:::.reshapeIncNumbers1DSparse(v, as.integer(prod(dim(darr)))))
-Rprof(NULL)
-prof_reshape1D_sparse <- summaryRprof()
-save(prof_reshape1D_sparse, file="prof_reshape1D_sparse.RData")
-
 # unfold (Dense)
 # h5write/write_block (85.53%)
 # vec (44.11%)
@@ -76,25 +61,16 @@ Rprof(NULL)
 prof_unfold_sparse <- summaryRprof()
 save(prof_unfold_sparse, file="prof_unfold_sparse.RData")
 
-# modeSum (Dense)
+# modeSum
 # realize/writeHDF5Array (57.56%)
 # read_block (31.90%)
-print("modeSum (Dense)")
+print("modeSum")
 setSparse(FALSE)
 Rprof()
 try(modeSum(darr, m=2))
 Rprof(NULL)
 prof_modesum_dense <- summaryRprof()
-save(prof_modesum_dense, file="prof_modesum_dense.RData")
-
-# modeSum (Sparse)
-# which (81.42%) <- 改善できそう?
-print("modeSum (Sparse)")
-Rprof()
-try(modeSum(darr, m=2))
-Rprof(NULL)
-prof_modesum_sparse <- summaryRprof()
-save(prof_modesum_sparse, file="prof_modesum_sparse.RData")
+save(prof_modesum, file="prof_modesum.RData")
 
 # innerProd (Dense)
 # sum (100.0%)
@@ -268,20 +244,16 @@ save(prof_hosvd_sparse, file="prof_hosvd_sparse.RData")
 print("cp (Dense)")
 setSparse(FALSE)
 Rprof()
-try(cp(darr, num_components=3, max_iter=2))
+try(cp(darr, num_components=2, max_iter=2))
 Rprof(NULL)
 prof_cp_dense <- summaryRprof()
 save(prof_cp_dense, file="prof_cp_dense.RData")
 
 # cp (Sparse)
-# こける
-# Error in dim(idx) <- c(.ndim(sarr2), length(idx)/.ndim(sarr2)) :
-#   dims [product 32] do not match the length of object [33]
-# XXXXXX (XX.XX%)
 print("cp (Sparse)")
 setSparse(TRUE)
 Rprof()
-try(cp(darr, num_components=3, max_iter=2))
+try(cp(darr, num_components=2, max_iter=2))
 Rprof(NULL)
 prof_cp_sparse <- summaryRprof()
 save(prof_cp_sparse, file="prof_cp_sparse.RData")
@@ -297,12 +269,6 @@ prof_tucker_dense <- summaryRprof()
 save(prof_tucker_dense, file="prof_tucker_dense.RData")
 
 # tucker (Sparse)
-# Warning in irlba(smat, k) :
-#   You're computing too large a percentage of total singular values, use a standard svd instead.
-# Warning in irlba(smat, k) :
-#   You're computing too large a percentage of total singular values, use a standard svd instead.
-# Warning in irlba(smat, k) :
-#   You're computing too large a percentage of total singular values, use a standard svd instead.
 # XXXXXX (XX.XX%)
 print("tucker (Sparse)")
 setSparse(TRUE)
@@ -334,9 +300,6 @@ save(prof_mpca_sparse, file="prof_mpca_sparse.RData")
 
 # pvd (Dense)
 # XXXXXX (XX.XX%)
-# こける
-# Error in validObject(.Object) : invalid class “DelayedArray” object:
-#     the supplied seed must have dimensions
 print("pvd (Dense)")
 setSparse(FALSE)
 Rprof()
@@ -348,9 +311,6 @@ save(prof_pvd_dense, file="prof_pvd_dense.RData")
 
 # pvd (Sparse)
 # XXXXXX (XX.XX%)
-# こける
-# Error in validObject(.Object) : invalid class “DelayedArray” object:
-#     the supplied seed must have dimensions
 print("pvd (Sparse)")
 setSparse(TRUE)
 Rprof()

@@ -18,18 +18,8 @@ setMethod("unfold", signature(darr="DelayedArray"),
     modes <- dim(darr)
     new_modes <- as.integer(c(prod(modes[row_idx]), prod(modes[col_idx])))
     mat <- aperm(darr, perm)
-    if(getSparse()$delayedtensor.sparse){
-        .reshapeIncNumbers1DSparse(vec(mat), new_modes)
-    }else{
-        .reshapeIncNumbers1D(vec(mat), new_modes)
-        # rearranges into a matrix (only HDF5Array can perform this for now)
-        # https://support.bioconductor.org/p/9136602/
-        # mat <- aperm(darr, perm)
-        # tmpfile <- tempfile()
-        # writeHDF5Array(mat, filepath=tmpfile, name="tmp", as.sparse=TRUE)
-        # out <- ReshapedHDF5Array(tmpfile, "tmp", new_modes)
-        # as(out, "DelayedMatrix")
-    }
+    vecobj <- .realize_and_return(vec(mat))
+    .reshapeIncNumbers1D(vecobj, new_modes)
 }
 
 # k_unfold
@@ -101,58 +91,6 @@ setMethod("modeSum", signature(darr="DelayedArray"),
 .modeSum <- function(darr, m, drop){
     # Argument Check
     .checkModeSum(darr, m)
-    if(getSparse()$delayedtensor.sparse){
-        out <- .modeSumSparse(darr, m)
-    }else{
-        out <- .modeSumDelayedArray(darr, m)
-    }
-    if(drop){
-        num_modes <- .ndim(darr)
-        dif <- setdiff(seq_len(num_modes), m)
-        out <- .realize_and_return(aperm(out, dif))
-    }
-    out
-}
-
-# For Sparse
-.modeSumSparse <- function(darr, m){
-    # Setting
-    num_modes <- .ndim(darr)
-    d2s <- dense2sparse(darr)
-    new_modes <- dim(d2s)
-    new_modes[m] <- 1
-    # Mode Summation
-    if(length(d2s@nzdata) == 0){
-        .array(new_modes)
-    }else{
-        sarr <- SparseArraySeed(new_modes)
-        uniq_indices <- unique(d2s@nzindex[, setdiff(seq_len(num_modes), m)])
-        if(length(d2s@nzdata) == 1){
-            nzindex <- matrix(0, nrow=1, ncol=num_modes)
-            nzindex[, m] <- 1
-            nzindex[, -m] <- uniq_indices
-            nzdata <- d2s@nzdata
-        }else{
-            nzindex <- matrix(0, nrow=nrow(uniq_indices), ncol=num_modes)
-            nzindex[, m] <- rep(1, nrow(uniq_indices))
-            nzindex[, -m] <- uniq_indices
-            nonm_index <- apply(d2s@nzindex[,-m], 1, function(x){
-                paste(x, collapse="-")
-            })
-            nzdata <- rep(0, nrow(uniq_indices))
-            nzdata <- apply(nzindex, 1, function(x){
-                sum(d2s@nzdata[which(paste(x[-m], collapse="-") == nonm_index)])
-            })
-        }
-        # Output
-        sarr@nzindex <- nzindex
-        sarr@nzdata <- nzdata
-        DelayedArray(sarr)
-    }
-}
-
-# For Dense
-.modeSumDelayedArray <- function(darr, m){
     # Setting
     num_modes <- .ndim(darr)
     perm <- c(m, (1L:num_modes)[-m])
@@ -192,7 +130,12 @@ setMethod("modeSum", signature(darr="DelayedArray"),
     }
     close(sink)
     out <- as(sink, "DelayedArray")
-    .realize_and_return(aperm(out, revperm))
+    out <- .realize_and_return(aperm(out, revperm))
+    if(drop){
+        dif <- setdiff(seq_len(num_modes), m)
+        out <- .realize_and_return(aperm(out, dif))
+    }
+    out
 }
 
 .block_modesum <- function(darr_p, darr_p_grid, bid){
@@ -230,18 +173,9 @@ setMethod("modeMean", signature(darr="DelayedArray"),
         .modeMean(darr, m, drop)})
 .modeMean <- function(darr, m, drop){
     modes <- dim(darr)
+    # ここはmodeSumみたいな関数を実装したほうが良いかも
     msum <- .modeSum(darr, m, drop)
-    if(options()$delayedtensor.sparse){
-        sarr <- dense2sparse(msum)
-        if(length(sarr@nzdata) == 0){
-            out <- msum
-        }else{
-            sarr@nzdata <- sarr@nzdata / modes[m]
-            out <- DelayedArray(sarr)
-        }
-    }else{
-        out <- msum / modes[m]
-    }
+    out <- msum / modes[m]
     .realize_and_return(out)
 }
 
@@ -265,30 +199,7 @@ setMethod("innerProd", signature(darr1="DelayedArray", darr2="DelayedArray"),
         .innerProd(darr1, darr2)})
 .innerProd <- function(darr1, darr2){
     stopifnot(identical(dim(darr1), dim(darr2)))
-    if(options()$delayedtensor.sparse){
-        sarr1 <- dense2sparse(darr1)
-        sarr2 <- dense2sparse(darr2)
-        idx1 <- apply(sarr1@nzindex, 1, function(x){
-            paste(x, collapse="-")
-        })
-        idx2 <- apply(sarr2@nzindex, 1, function(x){
-            paste(x, collapse="-")
-        })
-        common_idx <- intersect(idx1, idx2)
-        if(length(common_idx) == 0){
-            0L
-        }else{
-            target1 <- vapply(common_idx, function(x){
-                which(idx1 == x)
-            }, 0L)
-            target2 <- vapply(common_idx, function(x){
-                which(idx2 == x)
-            }, 0L)
-            sum(sarr1@nzdata[target1] * sarr2@nzdata[target2])
-        }
-    }else{
-        sum(darr1 * darr2)
-    }
+    sum(darr1 * darr2)
 }
 
 # outerProd
@@ -319,22 +230,50 @@ setMethod("vec", signature(darr="DelayedArray"),
     function(darr){
         .vec(darr)})
 .vec <- function(darr){
-    l <- as.integer(prod(dim(darr)))
-    if(options()$delayedtensor.sparse){
-        sarr <- dense2sparse(darr)
-        out <- SparseArraySeed(l)
-        if(length(sarr@nzdata) == 0){
-            .array(l)
-        }else{
-            out@nzdata <- sarr@nzdata
-            out@nzindex <- matrix(Mindex2Lindex(sarr@nzindex, dim(sarr)))
-            DelayedArray(out)
+    # Setting
+    modes <- as.integer(dim(darr))
+    new_modes <- as.integer(prod(dim(darr)))
+    block.size <- getAutoBlockSize()
+    # darr
+    darr_spacings <- .blockSizeScheduling(modes, block.size)
+    darr_grid <- RegularArrayGrid(
+        refdim=modes,
+        spacings=darr_spacings)
+    # sink
+    tickmarks <- unlist(gridApply(darr_grid, length))
+    tickmarks <- list(as.integer(cumsum(tickmarks)))
+    sink_grid <- ArbitraryArrayGrid(tickmarks = tickmarks)
+    ## check
+    .checkLimit(darr_grid, block.size)
+    .checkLimit(sink_grid, block.size)
+    stopifnot(length(darr_grid) == length(sink_grid))
+    # Block processing
+    setAutoRealizationBackend("HDF5Array")
+    sink <- AutoRealizationSink(new_modes)
+    for(bid in seq_along(sink_grid)){
+        viewport <- sink_grid[[bid]]
+        block <- .block_vec(darr, darr_grid, bid)
+        sink <- write_block(sink, viewport, block)
+        if(options()$delayedtensor.verbose){
+            cat(paste0("\\ Processing viewport ",
+                bid, "/", length(sink_grid), " ... OK\n"))
         }
+    }
+    close(sink)
+    as(sink, "DelayedArray")
+}
+
+.block_vec <- function(darr, darr_grid, bid){
+    if(options()$delayedtensor.sparse){
+        v <- read_block(darr, darr_grid[[bid]], as.sparse=TRUE)
+        out <- SparseArraySeed(prod(dim(v)))
+        out@nzdata <- v@nzdata
+        out@nzindex <- as.matrix(Mindex2Lindex(v@nzindex, dim(v)))
+        sparse2dense(out)
     }else{
-        tmpfile <- paste0(tempfile(), ".h5")
-        writeHDF5Array(darr, tmpfile, "tmp")
-        out <- ReshapedHDF5Array(tmpfile, "tmp", l)
-        as(out, "DelayedArray")
+        v <- read_block(darr, darr_grid[[bid]], as.sparse=FALSE)
+        dim(v) <- prod(dim(v))
+        v
     }
 }
 
@@ -349,49 +288,6 @@ setMethod("hadamard",
 .hadamard <- function(darr1, darr2){
     # Argument Check
     .checkHadamard(darr1, darr2)
-    if(getSparse()$delayedtensor.sparse){
-        .hadamardSparse(darr1, darr2)
-    }else{
-        .hadamardDelayedArray(darr1, darr2)
-    }
-}
-
-# For Sparse
-.hadamardSparse <- function(darr1, darr2){
-    # Setting
-    sarr1 <- dense2sparse(darr1)
-    sarr2 <- dense2sparse(darr2)
-    idx1 <- apply(sarr1@nzindex, 1, function(x){
-        paste(x, collapse="-")
-    })
-    idx2 <- apply(sarr2@nzindex, 1, function(x){
-        paste(x, collapse="-")
-    })
-    common_idx <- intersect(idx1, idx2)
-    if(length(common_idx) == 0){
-        .array(dim(darr1))
-    }else{
-        target1 <- vapply(common_idx, function(x){
-            which(idx1 == x)
-        }, 0L)
-        target2 <- vapply(common_idx, function(x){
-            which(idx2 == x)
-        }, 0L)
-        out <- SparseArraySeed(dim(darr1))
-        # Hadamard Product
-        nzdata <- sarr1@nzdata[target1] * sarr2@nzdata[target2]
-        if(length(common_idx) == 1){
-            out@nzindex <- t(sarr1@nzindex[target1, ])
-        }else{
-            out@nzindex <- sarr1@nzindex[target1, ]
-        }
-        out@nzdata <- nzdata
-        DelayedArray(out)
-    }
-}
-
-# For Dense
-.hadamardDelayedArray <- function(darr1, darr2){
     ## Setting
     mode1s <- as.integer(dim(darr1))
     mode2s <- as.integer(dim(darr2))
@@ -413,18 +309,47 @@ setMethod("hadamard",
         write_block(sink, sink_viewport, block)
     }
     sink <- gridReduce(FUN, sink_grid, sink,
-        verbose=getVerbose()$delayedtensor.verbose)
+        verbose=options()$delayedtensor.verbose)
     close(sink)
     as(sink, "DelayedArray")
 }
 
 .block_hadamard <- function(darr1, darr2, sink_grid, bid){
-    a <- read_block(darr1, sink_grid[[bid]])
-    b <- read_block(darr2, sink_grid[[bid]])
-    # Hadamard product
-    a <- as.array(a)
-    b <- as.array(b)
-    DelayedArray(a * b)
+    if(options()$delayedtensor.sparse){
+        a <- read_block(darr1, sink_grid[[bid]], as.sparse=TRUE)
+        b <- read_block(darr2, sink_grid[[bid]], as.sparse=TRUE)
+        idx1 <- apply(a@nzindex, 1, function(x){
+            paste(x, collapse="-")
+        })
+        idx2 <- apply(b@nzindex, 1, function(x){
+            paste(x, collapse="-")
+        })
+        common_idx <- intersect(idx1, idx2)
+        if(length(common_idx) == 0){
+            .array(dim(darr1))
+        }else{
+            target <- vapply(common_idx, function(x){
+                which(idx1 == x)
+            }, 0L)
+            out <- SparseArraySeed(dim(darr1))
+            # Hadamard Product
+            nzdata <- a@nzdata[target] * b@nzdata[target]
+            if(length(common_idx) == 1){
+                out@nzindex <- t(a@nzindex[target, ])
+            }else{
+                out@nzindex <- a@nzindex[target, ]
+            }
+            out@nzdata <- as.vector(nzdata)
+            DelayedArray(out)
+        }
+    }else{
+        a <- read_block(darr1, sink_grid[[bid]], as.sparse=FALSE)
+        b <- read_block(darr2, sink_grid[[bid]], as.sparse=FALSE)
+        # Hadamard product
+        a <- as.array(a)
+        b <- as.array(b)
+        DelayedArray(a * b)
+    }
 }
 
 # kronecker
@@ -438,43 +363,6 @@ setMethod("kronecker",
 .kronecker <- function(darr1, darr2){
     # Argument Check
     .checkKronecker(darr1, darr2)
-    if(getSparse()$delayedtensor.sparse){
-        .kroneckerSparse(darr1, darr2)
-    }else{
-        .kroneckerDelayedArray(darr1, darr2)
-    }
-}
-
-# For Sparse
-.kroneckerSparse <- function(darr1, darr2){
-    # Setting
-    sarr1 <- dense2sparse(darr1)
-    sarr2 <- dense2sparse(darr2)
-    new_modes <- dim(darr1)*dim(darr2)
-    # Kronecker Product
-    if(length(sarr1@nzdata)*length(sarr2@nzdata) == 0){
-        .array(new_modes)
-    }else{
-        out <- SparseArraySeed(new_modes)
-        nzindex <- .kroneckerIDX(sarr1, sarr2)
-        nzdata <- as.vector(outer(sarr1@nzdata, sarr2@nzdata))
-        out@nzindex <- nzindex
-        out@nzdata <- nzdata
-        DelayedArray(out)
-    }
-}
-
-.kroneckerIDX <- function(sarr1, sarr2){
-    idx <- apply(sarr2@nzindex, 1, function(x){
-        x + (dim(sarr2) * t(sarr1@nzindex - 1))
-    })
-    idx <- as.array(idx)
-    dim(idx) <- c(.ndim(sarr2), length(idx)/.ndim(sarr2))
-    t(idx)
-}
-
-# For Dense
-.kroneckerDelayedArray <- function(darr1, darr2){
     # Setting
     mode1s <- as.integer(dim(darr1))
     mode2s <- as.integer(dim(darr2))
@@ -508,7 +396,7 @@ setMethod("kronecker",
         block <- .block_kronecker(darr1, darr2,
             darr_grid_1, darr_grid_2, bid, block_modes)
         sink <- write_block(sink, viewport, block)
-        if(getVerbose()$delayedtensor.verbose){
+        if(options()$delayedtensor.verbose){
             cat(paste0("\\ Processing viewport ",
                 bid, "/", length(sink_grid), " ... OK\n"))
         }
@@ -523,12 +411,28 @@ setMethod("kronecker",
     idx1_idx2 <- .block_kroneckerIDX(bid, block_modes, darr_grid_1, darr_grid_2)
     idx1 <- idx1_idx2$idx1
     idx2 <- idx1_idx2$idx2
-    # Kronecker product
-    a <- read_block(darr1, darr_grid_1[[idx1]])
-    b <- read_block(darr2, darr_grid_2[[idx2]])
-    a <- as.array(a)
-    b <- as.array(b)
-    DelayedArray(base::kronecker(a, b))
+    if(options()$delayedtensor.sparse){
+        new_modes <- dim(darr1)*dim(darr2)
+        a <- read_block(darr1, darr_grid_1[[idx1]], as.sparse=TRUE)
+        b <- read_block(darr2, darr_grid_2[[idx2]], as.sparse=TRUE)
+        if(length(a@nzdata)*length(b@nzdata) == 0){
+            .array(new_modes)
+        }else{
+            out <- SparseArraySeed(new_modes)
+            nzindex <- .kroneckerIDX(a, b)
+            nzdata <- as.vector(outer(a@nzdata, b@nzdata))
+            out@nzindex <- nzindex
+            out@nzdata <- as.vector(nzdata)
+            DelayedArray(out)
+        }
+    }else{
+        a <- read_block(darr1, darr_grid_1[[idx1]], as.sparse=FALSE)
+        b <- read_block(darr2, darr_grid_2[[idx2]], as.sparse=FALSE)
+        a <- as.array(a)
+        b <- as.array(b)
+        # Kronecker product
+        DelayedArray(base::kronecker(a, b))
+    }
 }
 
 .block_kroneckerIDX <- function(bid, block_modes, darr_grid_1, darr_grid_2){
@@ -544,6 +448,15 @@ setMethod("kronecker",
     list(idx1=idx1, idx2=idx2)
 }
 
+.kroneckerIDX <- function(a, b){
+    idx <- apply(b@nzindex, 1, function(x){
+        x + (dim(b) * t(a@nzindex - 1))
+    })
+    idx <- as.array(idx)
+    dim(idx) <- c(.ndim(b), length(idx)/.ndim(b))
+    t(idx)
+}
+
 # khatri_rao
 setGeneric("khatri_rao",
     function(darr1, darr2){
@@ -555,59 +468,6 @@ setMethod("khatri_rao",
 .khatri_rao <- function(darr1, darr2){
     # Argument Check
     .checkKhatri_Rao(darr1, darr2)
-    if(getSparse()$delayedtensor.sparse){
-        .khatri_raoSparse(darr1, darr2)
-    }else{
-        .khatri_raoDelayedArray(darr1, darr2)
-    }
-}
-
-# For Sparse
-.khatri_raoSparse <- function(darr1, darr2){
-    # Setting
-    sarr1 <- dense2sparse(darr1)
-    sarr2 <- dense2sparse(darr2)
-    new_modes <- c(nrow(darr1)*nrow(darr2), ncol(darr1))
-    common_cols <- unique(intersect(sarr1@nzindex[,2], sarr2@nzindex[,2]))
-    # Khatri-Rao Product
-    check1 <- length(sarr1@nzdata)*length(sarr2@nzdata) == 0
-    check2 <- length(common_cols) == 0
-    if(check1 || check2){
-        .array(new_modes)
-    }else{
-        out <- SparseArraySeed(new_modes)
-        nzindex <- .khatri_raoIDX(sarr1, sarr2, common_cols)
-        nzdata <- .khatri_raoVALUE(sarr1, sarr2)
-        out@nzindex <- nzindex
-        out@nzdata <- nzdata
-        DelayedArray(out)
-    }
-}
-
-.khatri_raoIDX <- function(sarr1, sarr2, common_cols){
-    idx <- unlist(lapply(common_cols, function(y){
-        target1 <- which(sarr1@nzindex[,2] == y)
-        target2 <- which(sarr2@nzindex[,2] == y)
-        x <- sarr2@nzindex[target2,1] +
-            nrow(sarr2) * (sarr1@nzindex[target1,1] - 1)
-        c(x, y)
-    }))
-    idx <- as.array(idx)
-    dim(idx) <- c(.ndim(sarr2), length(idx)/.ndim(sarr2))
-    t(idx)
-}
-
-.khatri_raoVALUE <- function(sarr1, sarr2){
-    common_cols <- unique(intersect(sarr1@nzindex[,2], sarr2@nzindex[,2]))
-    unlist(lapply(common_cols, function(y){
-        target1 <- which(sarr1@nzindex[,2] == y)
-        target2 <- which(sarr2@nzindex[,2] == y)
-        as.vector(outer(sarr1@nzdata[target1], sarr2@nzdata[target2]))
-    }))
-}
-
-# For Dense
-.khatri_raoDelayedArray <- function(darr1, darr2){
     # Setting
     mode1s <- as.integer(dim(darr1))
     mode2s <- as.integer(dim(darr2))
@@ -645,7 +505,7 @@ setMethod("khatri_rao",
         block <- .block_khatri_rao(darr1, darr2,
             darr_grid_1, darr_grid_2, bid, block_modes)
         sink <- write_block(sink, viewport, block)
-        if(getVerbose()$delayedtensor.verbose){
+        if(options()$delayedtensor.verbose){
             cat(paste0("\\ Processing viewport ",
                 bid, "/", length(sink_grid), " ... OK\n"))
         }
@@ -661,17 +521,60 @@ setMethod("khatri_rao",
         bid, block_modes, darr_grid_1, darr_grid_2)
     idx1 <- idx1_idx2$idx1
     idx2 <- idx1_idx2$idx2
-    # Khatri-Rao product
-    a <- read_block(darr1, darr_grid_1[[idx1]])
-    b <- read_block(darr2, darr_grid_2[[idx2]])
-    stopifnot(ncol(a) == ncol(b))
-    a <- as.array(a)
-    b <- as.array(b)
-    out <- matrix(0, nrow=nrow(a)*nrow(b), ncol=ncol(a))
-    for(i in seq_len(ncol(a))){
-        out[,i] <- base::kronecker(as.matrix(a[,i]), as.matrix(b[,i]))
+    if(options()$delayedtensor.sparse){
+        new_modes <- c(nrow(darr1)*nrow(darr2), ncol(darr1))
+        a <- read_block(darr1, darr_grid_1[[idx1]], as.sparse=TRUE)
+        b <- read_block(darr2, darr_grid_2[[idx2]], as.sparse=TRUE)
+        common_cols <- unique(intersect(a@nzindex[,2], b@nzindex[,2]))
+        check1 <- length(a@nzdata)*length(b@nzdata) == 0
+        check2 <- length(common_cols) == 0
+        if(check1 || check2){
+            .array(new_modes)
+        }else{
+            out <- SparseArraySeed(new_modes)
+            nzindex <- .khatri_raoIDX(a, b, common_cols)
+            nzdata <- .khatri_raoVALUE(a, b, common_cols)
+            out@nzindex <- nzindex
+            out@nzdata <- as.vector(nzdata)
+            DelayedArray(out)
+        }
+    }else{
+        a <- read_block(darr1, darr_grid_1[[idx1]], as.sparse=FALSE)
+        b <- read_block(darr2, darr_grid_2[[idx2]], as.sparse=FALSE)
+        stopifnot(ncol(a) == ncol(b))
+        a <- as.array(a)
+        b <- as.array(b)
+        out <- matrix(0, nrow=nrow(a)*nrow(b), ncol=ncol(a))
+        # Khatri-Rao product
+        for(i in seq_len(ncol(a))){
+            out[,i] <- base::kronecker(as.matrix(a[,i]), as.matrix(b[,i]))
+        }
+        DelayedArray(out)
     }
-    DelayedArray(out)
+}
+
+.khatri_raoIDX <- function(a, b, common_cols){
+    x <- unlist(lapply(common_cols, function(xx){
+        target1 <- which(a@nzindex[,2] == xx)
+        target2 <- which(b@nzindex[,2] == xx)
+        unlist(lapply(nrow(b) * (a@nzindex[target1,1] - 1), function(xxx){
+            b@nzindex[target2,1] + xxx
+        }))
+    }))
+    y <- unlist(lapply(common_cols, function(xx){
+        target1 <- which(a@nzindex[,2] == xx)
+        target2 <- which(b@nzindex[,2] == xx)
+        rep(xx, length(target1)*length(target2))
+    }))
+    cbind(x, y)
+}
+
+.khatri_raoVALUE <- function(a, b, common_cols){
+    unlist(lapply(common_cols, function(xx){
+        target1 <- which(a@nzindex[,2] == xx)
+        target2 <- which(b@nzindex[,2] == xx)
+        as.vector(outer(b@nzdata[target2], a@nzdata[target1]))
+    }))
 }
 
 .block_khatri_rao_IDX2 <- function(bid, block_modes, darr_grid_1, darr_grid_2){
@@ -703,17 +606,7 @@ setMethod("fold",
     num_modes <- length(modes)
     # Reshaping
     new_modes <- as.integer(c(modes[row_idx], modes[col_idx]))
-    # sink <- .reshapeIncNumbers2D(mat, new_modes)
-    if(getSparse()$delayedtensor.sparse){
-        sink <- .reshapeIncNumbers1DSparse(vec(mat), new_modes)
-    }else{
-        sink <- .reshapeIncNumbers1D(vec(mat), new_modes)
-        # This part might be implemented by ReshapedHDF5Array in near future
-        # new_modes <- c(modes[row_idx], modes[col_idx])
-        # tmpfile <- tempfile()
-        # writeHDF5Array(mat, filepath=tmpfile, name="tmp", as.sparow_idxe=TRUE)
-        # sink <- ReshapedHDF5Array(tmpfile, "tmp", new_modes)
-    }
+    sink <- .reshapeIncNumbers1D(vec(mat), new_modes)
     #rearranges into array
     iperm <- match(seq_len(num_modes), c(row_idx, col_idx))
     sink <- aperm(sink, iperm)

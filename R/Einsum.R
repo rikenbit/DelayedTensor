@@ -2,8 +2,8 @@
 # Utility function to merge multiple Tensor based on
 # Einstein's summation convention
 #
-# subscripts = 'iiii->i'
-# operands = list(darrG)
+# subscripts = 'ij->ji'
+# operands = list(darrD)
 einsum <- function(subscripts, ...){
     # Preprocessing
     subscripts <- gsub(" ", "", subscripts)
@@ -38,12 +38,12 @@ einsum <- function(subscripts, ...){
         for(bid in seq_along(idx_grids)){
             idx <- Lindex2Mindex(bid, dim(idx_grids))
             colnames(idx) <- names(dim(idx_grids))
-            block1 <- .read_block(new_modes, idx, sink_grid, sink)
+            block1 <- .read_block_einsum(new_modes, idx, sink_grid, sink)
             block2 <- .block_einsum(subscripts, operands, operands_grids,
                 modes, idx)
-            sink <- .write_block(new_modes, idx, sink_grid,
+            sink <- .write_block_einsum(new_modes, idx, sink_grid,
                 sink, block1, block2)
-            if(getVerbose()$delayedtensor.verbose){
+            if(options()$delayedtensor.verbose){
                 cat(paste0("\\ Processing viewport ",
                     bid, "/", length(idx_grids), " ... OK\n"))
             }
@@ -98,7 +98,7 @@ einsum <- function(subscripts, ...){
 }
 
 # for sink
-.read_block <- function(new_modes, idx, sink_grid, sink){
+.read_block_einsum <- function(new_modes, idx, sink_grid, sink){
     if(identical(new_modes, 1L)){
         sink_idx <- 1L
     }else{
@@ -109,7 +109,8 @@ einsum <- function(subscripts, ...){
 }
 
 # for sink
-.write_block <- function(new_modes, idx, sink_grid, sink, block1, block2){
+.write_block_einsum <- function(new_modes, idx, sink_grid,
+    sink, block1, block2){
     if(identical(new_modes, 1L)){
         sink_idx <- 1L
     }else{

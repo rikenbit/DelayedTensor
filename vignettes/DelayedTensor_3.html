@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2021-06-07" />
+<meta name="date" content="2021-06-08" />
 
 <title>3. Tensor decomposition by DelayedTensor</title>
 
@@ -1854,7 +1854,7 @@ function toggle_visibility(id1) {
 <p class="author-name">Koki Tsuyuzaki<span class="affil-mark">1</span> and Itoshi Nikaido<span class="affil-mark">1*</span></p>
 <p class="author-affiliation"><span class="affil-mark">1</span>Laboratory for Bioinformatics Research, RIKEN Center for Biosystems Dynamics Research</p>
 <p class="author-email"><span class="affil-mark">*</span><a href="mailto:k.t.the-answer@hotmail.co.jp">k.t.the-answer@hotmail.co.jp</a></p>
-<h4 class="date">7 June 2021</h4>
+<h4 class="date">8 June 2021</h4>
 <h4 class="package">Package</h4>
 <p>DelayedTensor 0.99.0</p>
 
@@ -1875,15 +1875,15 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 </script>
 <p><strong>Authors</strong>: Koki Tsuyuzaki [aut, cre]<br />
-<strong>Last modified:</strong> 2021-06-05 14:38:00<br />
-<strong>Compiled</strong>: Mon Jun 7 12:46:20 2021</p>
+<strong>Last modified:</strong> 2021-06-07 18:42:57<br />
+<strong>Compiled</strong>: Tue Jun 8 12:08:00 2021</p>
 <div id="setting" class="section level1">
 <h1><span class="header-section-number">1</span> Setting</h1>
 <pre class="r"><code>suppressPackageStartupMessages(library(&quot;DelayedTensor&quot;))
 suppressPackageStartupMessages(library(&quot;DelayedArray&quot;))
 suppressPackageStartupMessages(library(&quot;DelayedRandomArray&quot;))
 
-darr &lt;- RandomUnifArray(c(2,3,4))
+darr &lt;- RandomUnifArray(c(3,4,5))
 
 setVerbose(FALSE)
 setSparse(FALSE)
@@ -1946,30 +1946,30 @@ and <code>tucker</code> performs HOOI Tucker decomposition.</p>
 <pre><code>## List of 4
 ##  $ Z          :Formal class 'DelayedArray' [package &quot;DelayedArray&quot;] with 1 slot
 ##   .. ..@ seed:Formal class 'HDF5ArraySeed' [package &quot;HDF5Array&quot;] with 7 slots
-##   .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/Rtmp3iDQqY/HDF5Array_dump/auto00014.h5&quot;
+##   .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/RtmpgjdAZq/HDF5Array_dump/auto00014.h5&quot;
 ##   .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO00014&quot;
 ##   .. .. .. ..@ as_sparse: logi FALSE
 ##   .. .. .. ..@ type     : chr NA
 ##   .. .. .. ..@ dim      : int [1:3] 2 1 3
 ##   .. .. .. ..@ chunkdim : int [1:3] 2 1 3
-##   .. .. .. ..@ first_val: num -2.36
+##   .. .. .. ..@ first_val: num -3.89
 ##  $ U          :List of 3
 ##   ..$ :Formal class 'DelayedMatrix' [package &quot;DelayedArray&quot;] with 1 slot
-##   .. .. ..@ seed: num [1:2, 1:2] -0.63 -0.777 -0.777 0.63
+##   .. .. ..@ seed: num [1:3, 1:2] -0.568 -0.627 -0.534 0.502 0.251 ...
 ##   ..$ :Formal class 'DelayedMatrix' [package &quot;DelayedArray&quot;] with 1 slot
-##   .. .. ..@ seed: num [1:3, 1] -0.619 -0.334 -0.711
+##   .. .. ..@ seed: num [1:4, 1] -0.445 -0.6 -0.506 -0.431
 ##   ..$ :Formal class 'DelayedMatrix' [package &quot;DelayedArray&quot;] with 1 slot
-##   .. .. ..@ seed: num [1:4, 1:3] -0.379 -0.404 -0.721 -0.417 -0.862 ...
+##   .. .. ..@ seed: num [1:5, 1:3] -0.49 -0.548 -0.407 -0.394 -0.374 ...
 ##  $ est        :Formal class 'DelayedArray' [package &quot;DelayedArray&quot;] with 1 slot
 ##   .. ..@ seed:Formal class 'HDF5ArraySeed' [package &quot;HDF5Array&quot;] with 7 slots
-##   .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/Rtmp3iDQqY/HDF5Array_dump/auto00025.h5&quot;
+##   .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/RtmpgjdAZq/HDF5Array_dump/auto00025.h5&quot;
 ##   .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO00025&quot;
 ##   .. .. .. ..@ as_sparse: logi FALSE
 ##   .. .. .. ..@ type     : chr NA
-##   .. .. .. ..@ dim      : int [1:3] 2 3 4
-##   .. .. .. ..@ chunkdim : int [1:3] 2 3 4
-##   .. .. .. ..@ first_val: num 0.463
-##  $ fnorm_resid: num 1.35</code></pre>
+##   .. .. .. ..@ dim      : int [1:3] 3 4 5
+##   .. .. .. ..@ chunkdim : int [1:3] 3 4 5
+##   .. .. .. ..@ first_val: num 0.522
+##  $ fnorm_resid: num 2.02</code></pre>
 <pre class="r"><code>out_tucker &lt;- tucker(darr, ranks=c(2,3,2))</code></pre>
 <pre><code>## 
   |                                                                            
@@ -1979,38 +1979,54 @@ and <code>tucker</code> performs HOOI Tucker decomposition.</p>
   |                                                                            
   |======                                                                |   8%
   |                                                                            
+  |========                                                              |  12%
+  |                                                                            
+  |===========                                                           |  16%
+  |                                                                            
+  |==============                                                        |  20%
+  |                                                                            
+  |=================                                                     |  24%
+  |                                                                            
+  |====================                                                  |  28%
+  |                                                                            
+  |======================                                                |  32%
+  |                                                                            
+  |=========================                                             |  36%
+  |                                                                            
+  |============================                                          |  40%
+  |                                                                            
   |======================================================================| 100%</code></pre>
 <pre class="r"><code>str(out_tucker)</code></pre>
 <pre><code>## List of 7
 ##  $ Z           :Formal class 'DelayedArray' [package &quot;DelayedArray&quot;] with 1 slot
 ##   .. ..@ seed:Formal class 'HDF5ArraySeed' [package &quot;HDF5Array&quot;] with 7 slots
-##   .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/Rtmp3iDQqY/HDF5Array_dump/auto00097.h5&quot;
-##   .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO00097&quot;
+##   .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/RtmpgjdAZq/HDF5Array_dump/auto00417.h5&quot;
+##   .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO00417&quot;
 ##   .. .. .. ..@ as_sparse: logi FALSE
 ##   .. .. .. ..@ type     : chr NA
 ##   .. .. .. ..@ dim      : int [1:3] 2 3 2
 ##   .. .. .. ..@ chunkdim : int [1:3] 2 3 2
-##   .. .. .. ..@ first_val: num -2.36
+##   .. .. .. ..@ first_val: num -3.89
 ##  $ U           :List of 3
 ##   ..$ :Formal class 'DelayedMatrix' [package &quot;DelayedArray&quot;] with 1 slot
-##   .. .. ..@ seed: num [1:2, 1:2] -0.624 -0.782 -0.782 0.624
+##   .. .. ..@ seed: num [1:3, 1:2] -0.552 -0.631 -0.545 0.502 0.271 ...
 ##   ..$ :Formal class 'DelayedMatrix' [package &quot;DelayedArray&quot;] with 1 slot
-##   .. .. ..@ seed: num [1:3, 1:3] 0.609 0.328 0.722 0.622 0.367 ...
+##   .. .. ..@ seed: num [1:4, 1:3] -0.44 -0.611 -0.503 -0.424 0.569 ...
 ##   ..$ :Formal class 'DelayedMatrix' [package &quot;DelayedArray&quot;] with 1 slot
-##   .. .. ..@ seed: num [1:4, 1:2] 0.379 0.404 0.721 0.417 0.862 ...
+##   .. .. ..@ seed: num [1:5, 1:2] -0.49 -0.545 -0.403 -0.4 -0.374 ...
 ##  $ conv        : logi TRUE
 ##  $ est         :Formal class 'DelayedArray' [package &quot;DelayedArray&quot;] with 1 slot
 ##   .. ..@ seed:Formal class 'HDF5ArraySeed' [package &quot;HDF5Array&quot;] with 7 slots
-##   .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/Rtmp3iDQqY/HDF5Array_dump/auto00119.h5&quot;
-##   .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO00119&quot;
+##   .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/RtmpgjdAZq/HDF5Array_dump/auto00439.h5&quot;
+##   .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO00439&quot;
 ##   .. .. .. ..@ as_sparse: logi FALSE
 ##   .. .. .. ..@ type     : chr NA
-##   .. .. .. ..@ dim      : int [1:3] 2 3 4
-##   .. .. .. ..@ chunkdim : int [1:3] 2 3 4
-##   .. .. .. ..@ first_val: num 0.182
-##  $ norm_percent: num 67
-##  $ fnorm_resid : num 0.902
-##  $ all_resids  : num [1:2] 0.902 0.902</code></pre>
+##   .. .. .. ..@ dim      : int [1:3] 3 4 5
+##   .. .. .. ..@ chunkdim : int [1:3] 3 4 5
+##   .. .. .. ..@ first_val: num 0.591
+##  $ norm_percent: num 64.9
+##  $ fnorm_resid : num 1.55
+##  $ all_resids  : num [1:10] 1.58 1.56 1.55 1.55 1.55 ...</code></pre>
 </div>
 <div id="candecompparafac-cp-decomposition" class="section level2">
 <h2><span class="header-section-number">2.2</span> CANDECOMP/PARAFAC (CP) Decomposition</h2>
@@ -2071,10 +2087,38 @@ and <code>cp</code> performs the ALS CP decomposition.</p>
   |                                                                            
   |=====================================================                 |  76%
   |                                                                            
+  |========================================================              |  80%
+  |                                                                            
+  |===========================================================           |  84%
+  |                                                                            
+  |==============================================================        |  88%
+  |                                                                            
+  |================================================================      |  92%
+  |                                                                            
+  |===================================================================   |  96%
+  |                                                                            
   |======================================================================| 100%</code></pre>
 <pre class="r"><code>str(out_cp)</code></pre>
 <pre><code>## List of 7
-##  $ lambdas     : num [1:2] 2.04 1.27
+##  $ lambdas     :Formal class 'DelayedArray' [package &quot;DelayedArray&quot;] with 1 slot
+##   .. ..@ seed:Formal class 'DelayedSubassign' [package &quot;DelayedArray&quot;] with 4 slots
+##   .. .. .. ..@ Lindex:List of 1
+##   .. .. .. .. ..$ : int 2
+##   .. .. .. ..@ Rvalue: num 4.58
+##   .. .. .. ..@ .nogap: logi FALSE
+##   .. .. .. ..@ seed  :Formal class 'DelayedSubassign' [package &quot;DelayedArray&quot;] with 4 slots
+##   .. .. .. .. .. ..@ Lindex:List of 1
+##   .. .. .. .. .. .. ..$ : int 1
+##   .. .. .. .. .. ..@ Rvalue: num 1.99
+##   .. .. .. .. .. ..@ .nogap: logi FALSE
+##   .. .. .. .. .. ..@ seed  :Formal class 'HDF5ArraySeed' [package &quot;HDF5Array&quot;] with 7 slots
+##   .. .. .. .. .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/RtmpgjdAZq/HDF5Array_dump/auto01727.h5&quot;
+##   .. .. .. .. .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO01727&quot;
+##   .. .. .. .. .. .. .. ..@ as_sparse: logi FALSE
+##   .. .. .. .. .. .. .. ..@ type     : chr NA
+##   .. .. .. .. .. .. .. ..@ dim      : int 2
+##   .. .. .. .. .. .. .. ..@ chunkdim : int 2
+##   .. .. .. .. .. .. .. ..@ first_val: num 0
 ##  $ U           :List of 3
 ##   ..$ :Formal class 'DelayedMatrix' [package &quot;DelayedArray&quot;] with 1 slot
 ##   .. .. ..@ seed:Formal class 'DelayedAperm' [package &quot;DelayedArray&quot;] with 2 slots
@@ -2083,39 +2127,19 @@ and <code>cp</code> performs the ALS CP decomposition.</p>
 ##   .. .. .. .. .. .. ..@ OP    :function (e1, e2)  
 ##   .. .. .. .. .. .. ..@ Largs : list()
 ##   .. .. .. .. .. .. ..@ Rargs :List of 1
-##   .. .. .. .. .. .. .. ..$ : num [1:2] 2.04 1.27
+##   .. .. .. .. .. .. .. ..$ : num [1:2] 1.97 4.54
 ##   .. .. .. .. .. .. ..@ Lalong: int(0) 
 ##   .. .. .. .. .. .. ..@ Ralong: int 1
 ##   .. .. .. .. .. .. ..@ seed  :Formal class 'DelayedAperm' [package &quot;DelayedArray&quot;] with 2 slots
 ##   .. .. .. .. .. .. .. .. ..@ perm: int [1:2] 2 1
 ##   .. .. .. .. .. .. .. .. ..@ seed:Formal class 'HDF5ArraySeed' [package &quot;HDF5Array&quot;] with 7 slots
-##   .. .. .. .. .. .. .. .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/Rtmp3iDQqY/HDF5Array_dump/auto01046.h5&quot;
-##   .. .. .. .. .. .. .. .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO01046&quot;
-##   .. .. .. .. .. .. .. .. .. .. ..@ as_sparse: logi FALSE
-##   .. .. .. .. .. .. .. .. .. .. ..@ type     : chr NA
-##   .. .. .. .. .. .. .. .. .. .. ..@ dim      : int [1:2] 2 2
-##   .. .. .. .. .. .. .. .. .. .. ..@ chunkdim : int [1:2] 2 2
-##   .. .. .. .. .. .. .. .. .. .. ..@ first_val: num 1.4
-##   ..$ :Formal class 'DelayedMatrix' [package &quot;DelayedArray&quot;] with 1 slot
-##   .. .. ..@ seed:Formal class 'DelayedAperm' [package &quot;DelayedArray&quot;] with 2 slots
-##   .. .. .. .. ..@ perm: int [1:2] 2 1
-##   .. .. .. .. ..@ seed:Formal class 'DelayedUnaryIsoOpWithArgs' [package &quot;DelayedArray&quot;] with 6 slots
-##   .. .. .. .. .. .. ..@ OP    :function (e1, e2)  
-##   .. .. .. .. .. .. ..@ Largs : list()
-##   .. .. .. .. .. .. ..@ Rargs :List of 1
-##   .. .. .. .. .. .. .. ..$ : num [1:2] 2.04 1.27
-##   .. .. .. .. .. .. ..@ Lalong: int(0) 
-##   .. .. .. .. .. .. ..@ Ralong: int 1
-##   .. .. .. .. .. .. ..@ seed  :Formal class 'DelayedAperm' [package &quot;DelayedArray&quot;] with 2 slots
-##   .. .. .. .. .. .. .. .. ..@ perm: int [1:2] 2 1
-##   .. .. .. .. .. .. .. .. ..@ seed:Formal class 'HDF5ArraySeed' [package &quot;HDF5Array&quot;] with 7 slots
-##   .. .. .. .. .. .. .. .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/Rtmp3iDQqY/HDF5Array_dump/auto01063.h5&quot;
-##   .. .. .. .. .. .. .. .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO01063&quot;
+##   .. .. .. .. .. .. .. .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/RtmpgjdAZq/HDF5Array_dump/auto01690.h5&quot;
+##   .. .. .. .. .. .. .. .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO01690&quot;
 ##   .. .. .. .. .. .. .. .. .. .. ..@ as_sparse: logi FALSE
 ##   .. .. .. .. .. .. .. .. .. .. ..@ type     : chr NA
 ##   .. .. .. .. .. .. .. .. .. .. ..@ dim      : int [1:2] 3 2
 ##   .. .. .. .. .. .. .. .. .. .. ..@ chunkdim : int [1:2] 3 2
-##   .. .. .. .. .. .. .. .. .. .. ..@ first_val: num 0.749
+##   .. .. .. .. .. .. .. .. .. .. ..@ first_val: num 0.779
 ##   ..$ :Formal class 'DelayedMatrix' [package &quot;DelayedArray&quot;] with 1 slot
 ##   .. .. ..@ seed:Formal class 'DelayedAperm' [package &quot;DelayedArray&quot;] with 2 slots
 ##   .. .. .. .. ..@ perm: int [1:2] 2 1
@@ -2123,32 +2147,52 @@ and <code>cp</code> performs the ALS CP decomposition.</p>
 ##   .. .. .. .. .. .. ..@ OP    :function (e1, e2)  
 ##   .. .. .. .. .. .. ..@ Largs : list()
 ##   .. .. .. .. .. .. ..@ Rargs :List of 1
-##   .. .. .. .. .. .. .. ..$ : num [1:2] 2.04 1.27
+##   .. .. .. .. .. .. .. ..$ : num [1:2] 1.98 4.57
 ##   .. .. .. .. .. .. ..@ Lalong: int(0) 
 ##   .. .. .. .. .. .. ..@ Ralong: int 1
 ##   .. .. .. .. .. .. ..@ seed  :Formal class 'DelayedAperm' [package &quot;DelayedArray&quot;] with 2 slots
 ##   .. .. .. .. .. .. .. .. ..@ perm: int [1:2] 2 1
 ##   .. .. .. .. .. .. .. .. ..@ seed:Formal class 'HDF5ArraySeed' [package &quot;HDF5Array&quot;] with 7 slots
-##   .. .. .. .. .. .. .. .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/Rtmp3iDQqY/HDF5Array_dump/auto01080.h5&quot;
-##   .. .. .. .. .. .. .. .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO01080&quot;
+##   .. .. .. .. .. .. .. .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/RtmpgjdAZq/HDF5Array_dump/auto01708.h5&quot;
+##   .. .. .. .. .. .. .. .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO01708&quot;
 ##   .. .. .. .. .. .. .. .. .. .. ..@ as_sparse: logi FALSE
 ##   .. .. .. .. .. .. .. .. .. .. ..@ type     : chr NA
 ##   .. .. .. .. .. .. .. .. .. .. ..@ dim      : int [1:2] 4 2
 ##   .. .. .. .. .. .. .. .. .. .. ..@ chunkdim : int [1:2] 4 2
-##   .. .. .. .. .. .. .. .. .. .. ..@ first_val: num 1.34
-##  $ conv        : logi TRUE
+##   .. .. .. .. .. .. .. .. .. .. ..@ first_val: num -1.4
+##   ..$ :Formal class 'DelayedMatrix' [package &quot;DelayedArray&quot;] with 1 slot
+##   .. .. ..@ seed:Formal class 'DelayedAperm' [package &quot;DelayedArray&quot;] with 2 slots
+##   .. .. .. .. ..@ perm: int [1:2] 2 1
+##   .. .. .. .. ..@ seed:Formal class 'DelayedUnaryIsoOpWithArgs' [package &quot;DelayedArray&quot;] with 6 slots
+##   .. .. .. .. .. .. ..@ OP    :function (e1, e2)  
+##   .. .. .. .. .. .. ..@ Largs : list()
+##   .. .. .. .. .. .. ..@ Rargs :List of 1
+##   .. .. .. .. .. .. .. ..$ : num [1:2] 1.99 4.58
+##   .. .. .. .. .. .. ..@ Lalong: int(0) 
+##   .. .. .. .. .. .. ..@ Ralong: int 1
+##   .. .. .. .. .. .. ..@ seed  :Formal class 'DelayedAperm' [package &quot;DelayedArray&quot;] with 2 slots
+##   .. .. .. .. .. .. .. .. ..@ perm: int [1:2] 2 1
+##   .. .. .. .. .. .. .. .. ..@ seed:Formal class 'HDF5ArraySeed' [package &quot;HDF5Array&quot;] with 7 slots
+##   .. .. .. .. .. .. .. .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/RtmpgjdAZq/HDF5Array_dump/auto01726.h5&quot;
+##   .. .. .. .. .. .. .. .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO01726&quot;
+##   .. .. .. .. .. .. .. .. .. .. ..@ as_sparse: logi FALSE
+##   .. .. .. .. .. .. .. .. .. .. ..@ type     : chr NA
+##   .. .. .. .. .. .. .. .. .. .. ..@ dim      : int [1:2] 5 2
+##   .. .. .. .. .. .. .. .. .. .. ..@ chunkdim : int [1:2] 5 2
+##   .. .. .. .. .. .. .. .. .. .. ..@ first_val: num 0.479
+##  $ conv        : logi FALSE
 ##  $ est         :Formal class 'DelayedArray' [package &quot;DelayedArray&quot;] with 1 slot
 ##   .. ..@ seed:Formal class 'HDF5ArraySeed' [package &quot;HDF5Array&quot;] with 7 slots
-##   .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/Rtmp3iDQqY/HDF5Array_dump/auto01091.h5&quot;
-##   .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO01091&quot;
+##   .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/RtmpgjdAZq/HDF5Array_dump/auto01738.h5&quot;
+##   .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO01738&quot;
 ##   .. .. .. ..@ as_sparse: logi FALSE
 ##   .. .. .. ..@ type     : chr NA
-##   .. .. .. ..@ dim      : int [1:3] 2 3 4
-##   .. .. .. ..@ chunkdim : int [1:3] 2 3 4
-##   .. .. .. ..@ first_val: num 0.144
-##  $ norm_percent: num 63.7
-##  $ fnorm_resid : num 0.993
-##  $ all_resids  : num [1:19] 1.072 1.01 0.998 0.995 0.994 ...</code></pre>
+##   .. .. .. ..@ dim      : int [1:3] 3 4 5
+##   .. .. .. ..@ chunkdim : int [1:3] 3 4 5
+##   .. .. .. ..@ first_val: num 0.542
+##  $ norm_percent: num 62.8
+##  $ fnorm_resid : num 1.64
+##  $ all_resids  : num [1:24] 1.78 1.67 1.67 1.66 1.66 ...</code></pre>
 </div>
 <div id="multilinear-principal-component-analysis-mpca" class="section level2">
 <h2><span class="header-section-number">2.3</span> Multilinear Principal Component Analysis (MPCA)</h2>
@@ -2156,18 +2200,48 @@ and <code>cp</code> performs the ALS CP decomposition.</p>
 this is also known as the
 Generalized Low Rank Approximation of Matrices (GLRAM).
 For the details, check the <code>mpca</code> function of <em><a href="https://CRAN.R-project.org/package=rTensor">rTensor</a></em>.</p>
-<pre class="r"><code>out_mpca &lt;- mpca
-str(out_mpca)</code></pre>
-<pre><code>## Formal class 'nonstandardGenericFunction' [package &quot;methods&quot;] with 8 slots
-##   ..@ .Data     :function (darr, ranks = NULL, max_iter = 25, tol = 1e-05)  
-##   ..@ generic   : chr &quot;mpca&quot;
-##   .. ..- attr(*, &quot;package&quot;)= chr &quot;DelayedTensor&quot;
-##   ..@ package   : chr &quot;DelayedTensor&quot;
-##   ..@ group     : list()
-##   ..@ valueClass: chr(0) 
-##   ..@ signature : chr [1:4] &quot;darr&quot; &quot;ranks&quot; &quot;max_iter&quot; &quot;tol&quot;
-##   ..@ default   : NULL
-##   ..@ skeleton  : language (function (darr, ranks = NULL, max_iter = 25, tol = 1e-05)  stop(&quot;invalid call in method dispatch to 'mpca' (no d| __truncated__ ...</code></pre>
+<pre class="r"><code>out_mpca &lt;- mpca(darr, ranks=c(2,2))</code></pre>
+<pre><code>## 
+  |                                                                            
+  |                                                                      |   0%
+  |                                                                            
+  |===                                                                   |   4%
+  |                                                                            
+  |======                                                                |   8%
+  |                                                                            
+  |========                                                              |  12%
+  |                                                                            
+  |======================================================================| 100%</code></pre>
+<pre class="r"><code>str(out_mpca)</code></pre>
+<pre><code>## List of 7
+##  $ Z_ext       :Formal class 'DelayedArray' [package &quot;DelayedArray&quot;] with 1 slot
+##   .. ..@ seed:Formal class 'HDF5ArraySeed' [package &quot;HDF5Array&quot;] with 7 slots
+##   .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/RtmpgjdAZq/HDF5Array_dump/auto01802.h5&quot;
+##   .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO01802&quot;
+##   .. .. .. ..@ as_sparse: logi FALSE
+##   .. .. .. ..@ type     : chr NA
+##   .. .. .. ..@ dim      : int [1:3] 2 2 5
+##   .. .. .. ..@ chunkdim : int [1:3] 2 2 5
+##   .. .. .. ..@ first_val: num 1.89
+##  $ U           :List of 3
+##   ..$ :Formal class 'DelayedMatrix' [package &quot;DelayedArray&quot;] with 1 slot
+##   .. .. ..@ seed: num [1:3, 1:2] -0.559 -0.633 -0.536 0.325 0.427 ...
+##   ..$ :Formal class 'DelayedMatrix' [package &quot;DelayedArray&quot;] with 1 slot
+##   .. .. ..@ seed: num [1:4, 1:2] -0.442 -0.601 -0.508 -0.43 0.443 ...
+##   ..$ : NULL
+##  $ conv        : logi TRUE
+##  $ est         :Formal class 'DelayedArray' [package &quot;DelayedArray&quot;] with 1 slot
+##   .. ..@ seed:Formal class 'HDF5ArraySeed' [package &quot;HDF5Array&quot;] with 7 slots
+##   .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/RtmpgjdAZq/HDF5Array_dump/auto01816.h5&quot;
+##   .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO01816&quot;
+##   .. .. .. ..@ as_sparse: logi FALSE
+##   .. .. .. ..@ type     : chr NA
+##   .. .. .. ..@ dim      : int [1:3] 3 4 5
+##   .. .. .. ..@ chunkdim : int [1:3] 3 4 5
+##   .. .. .. ..@ first_val: num 0.501
+##  $ norm_percent: num 66.3
+##  $ fnorm_resid : num 1.49
+##  $ all_resids  : num [1:3] 1.49 1.49 1.49</code></pre>
 </div>
 <div id="population-value-decomposition-pvd" class="section level2">
 <h2><span class="header-section-number">2.4</span> Population Value Decomposition (PVD)</h2>
@@ -2182,18 +2256,85 @@ and a <span class="math inline">\(X_{j}\)</span> specific factor matrix <span cl
 X_{j} = P \times V_{j} \times D
 \]</span></p>
 <p>For the details, check the <code>pvd</code> function of <em><a href="https://CRAN.R-project.org/package=rTensor">rTensor</a></em>.</p>
-<pre class="r"><code>out_pvd &lt;- pvd
-str(out_mpca)</code></pre>
-<pre><code>## Formal class 'nonstandardGenericFunction' [package &quot;methods&quot;] with 8 slots
-##   ..@ .Data     :function (darr, ranks = NULL, max_iter = 25, tol = 1e-05)  
-##   ..@ generic   : chr &quot;mpca&quot;
-##   .. ..- attr(*, &quot;package&quot;)= chr &quot;DelayedTensor&quot;
-##   ..@ package   : chr &quot;DelayedTensor&quot;
-##   ..@ group     : list()
-##   ..@ valueClass: chr(0) 
-##   ..@ signature : chr [1:4] &quot;darr&quot; &quot;ranks&quot; &quot;max_iter&quot; &quot;tol&quot;
-##   ..@ default   : NULL
-##   ..@ skeleton  : language (function (darr, ranks = NULL, max_iter = 25, tol = 1e-05)  stop(&quot;invalid call in method dispatch to 'mpca' (no d| __truncated__ ...</code></pre>
+<pre class="r"><code>out_pvd &lt;- pvd(darr,
+  uranks=rep(2,dim(darr)[3]), wranks=rep(3,dim(darr)[3]), a=2, b=3)</code></pre>
+<pre><code>## 
+  |                                                                            
+  |                                                                      |   0%
+  |                                                                            
+  |=========                                                             |  12%
+  |                                                                            
+  |==================                                                    |  25%
+  |                                                                            
+  |==========================                                            |  38%
+  |                                                                            
+  |===================================                                   |  50%
+  |                                                                            
+  |============================================                          |  62%
+  |                                                                            
+  |====================================================                  |  75%
+  |                                                                            
+  |=============================================================         |  88%
+  |                                                                            
+  |======================================================================| 100%</code></pre>
+<pre class="r"><code>str(out_pvd)</code></pre>
+<pre><code>## List of 6
+##  $ P           :Formal class 'DelayedMatrix' [package &quot;DelayedArray&quot;] with 1 slot
+##   .. ..@ seed: num [1:3, 1:2] -0.5439 -0.599 -0.5877 0.7596 -0.0538 ...
+##  $ D           :Formal class 'DelayedMatrix' [package &quot;DelayedArray&quot;] with 1 slot
+##   .. ..@ seed:Formal class 'DelayedAperm' [package &quot;DelayedArray&quot;] with 2 slots
+##   .. .. .. ..@ perm: int [1:2] 2 1
+##   .. .. .. ..@ seed: num [1:4, 1:3] -0.596 -0.56 -0.27 -0.508 0.389 ...
+##  $ V           :List of 5
+##   ..$ :Formal class 'DelayedMatrix' [package &quot;DelayedArray&quot;] with 1 slot
+##   .. .. ..@ seed:Formal class 'HDF5ArraySeed' [package &quot;HDF5Array&quot;] with 7 slots
+##   .. .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/RtmpgjdAZq/HDF5Array_dump/auto01830.h5&quot;
+##   .. .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO01830&quot;
+##   .. .. .. .. ..@ as_sparse: logi FALSE
+##   .. .. .. .. ..@ type     : chr NA
+##   .. .. .. .. ..@ dim      : int [1:2] 2 3
+##   .. .. .. .. ..@ chunkdim : int [1:2] 2 3
+##   .. .. .. .. ..@ first_val: num 1.93
+##   ..$ :Formal class 'DelayedMatrix' [package &quot;DelayedArray&quot;] with 1 slot
+##   .. .. ..@ seed:Formal class 'HDF5ArraySeed' [package &quot;HDF5Array&quot;] with 7 slots
+##   .. .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/RtmpgjdAZq/HDF5Array_dump/auto01836.h5&quot;
+##   .. .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO01836&quot;
+##   .. .. .. .. ..@ as_sparse: logi FALSE
+##   .. .. .. .. ..@ type     : chr NA
+##   .. .. .. .. ..@ dim      : int [1:2] 2 3
+##   .. .. .. .. ..@ chunkdim : int [1:2] 2 3
+##   .. .. .. .. ..@ first_val: num 1.83
+##   ..$ :Formal class 'DelayedMatrix' [package &quot;DelayedArray&quot;] with 1 slot
+##   .. .. ..@ seed:Formal class 'HDF5ArraySeed' [package &quot;HDF5Array&quot;] with 7 slots
+##   .. .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/RtmpgjdAZq/HDF5Array_dump/auto01842.h5&quot;
+##   .. .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO01842&quot;
+##   .. .. .. .. ..@ as_sparse: logi FALSE
+##   .. .. .. .. ..@ type     : chr NA
+##   .. .. .. .. ..@ dim      : int [1:2] 2 3
+##   .. .. .. .. ..@ chunkdim : int [1:2] 2 3
+##   .. .. .. .. ..@ first_val: num 1.41
+##   ..$ :Formal class 'DelayedMatrix' [package &quot;DelayedArray&quot;] with 1 slot
+##   .. .. ..@ seed:Formal class 'HDF5ArraySeed' [package &quot;HDF5Array&quot;] with 7 slots
+##   .. .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/RtmpgjdAZq/HDF5Array_dump/auto01848.h5&quot;
+##   .. .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO01848&quot;
+##   .. .. .. .. ..@ as_sparse: logi FALSE
+##   .. .. .. .. ..@ type     : chr NA
+##   .. .. .. .. ..@ dim      : int [1:2] 2 3
+##   .. .. .. .. ..@ chunkdim : int [1:2] 2 3
+##   .. .. .. .. ..@ first_val: num 1.4
+##   ..$ :Formal class 'DelayedMatrix' [package &quot;DelayedArray&quot;] with 1 slot
+##   .. .. ..@ seed:Formal class 'HDF5ArraySeed' [package &quot;HDF5Array&quot;] with 7 slots
+##   .. .. .. .. ..@ filepath : chr &quot;/private/var/folders/k0/tk8gl4bj2_v2mbjx80ydsznw0000gn/T/RtmpgjdAZq/HDF5Array_dump/auto01854.h5&quot;
+##   .. .. .. .. ..@ name     : chr &quot;/HDF5ArrayAUTO01854&quot;
+##   .. .. .. .. ..@ as_sparse: logi FALSE
+##   .. .. .. .. ..@ type     : chr NA
+##   .. .. .. .. ..@ dim      : int [1:2] 2 3
+##   .. .. .. .. ..@ chunkdim : int [1:2] 2 3
+##   .. .. .. .. ..@ first_val: num 1.64
+##  $ est         :Formal class 'DelayedArray' [package &quot;DelayedArray&quot;] with 1 slot
+##   .. ..@ seed: num [1:3, 1:4, 1:5] 0.705 0.542 0.375 0.612 0.59 ...
+##  $ norm_percent: num 69.7
+##  $ fnorm_resid : num 1.33</code></pre>
 </div>
 </div>
 <div id="session-information" class="section level1 unnumbered">

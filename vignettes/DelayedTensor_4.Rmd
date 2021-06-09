@@ -421,12 +421,12 @@ darr2 <- DelayedArray(array(20:1, dim=c(4,5)))
 mykronecker <- function(darr1, darr2){
     stopifnot((length(dim(darr1)) == 2) && (length(dim(darr2)) == 2))
     # Outer Product
-    tmpdarr <- einsum('ij,kl->ikjl', darr1, darr2)
+    tmpdarr <- DelayedTensor::einsum('ij,kl->ikjl', darr1, darr2)
     # Reshape
-    unfold(tmpdarr, row_idx=c(2,1), col_idx=c(4,3))
+    DelayedTensor::unfold(tmpdarr, row_idx=c(2,1), col_idx=c(4,3))
 }
 
-identical(as.array(kronecker(darr1, darr2)),
+identical(as.array(DelayedTensor::kronecker(darr1, darr2)),
     as.array(mykronecker(darr1, darr2)))
 ```
 

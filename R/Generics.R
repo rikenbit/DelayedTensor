@@ -173,7 +173,6 @@ setMethod("modeMean", signature(darr="DelayedArray"),
         .modeMean(darr, m, drop)})
 .modeMean <- function(darr, m, drop){
     modes <- dim(darr)
-    # ここはmodeSumみたいな関数を実装したほうが良いかも
     msum <- .modeSum(darr, m, drop)
     out <- msum / modes[m]
     .realize_and_return(out)

@@ -9,10 +9,10 @@ dsubject <- DelayedArray(faces_tnsr[,,21,]@data)
 # subject <- as.tensor(faces_tnsr[,,21,])
 # dsubject <- DelayedArray(faces_tnsr[,,21,])
 
-# visual confirmation
-png(file="GrandTruth.png")
-image(subject@data[,,1])
-dev.off()
+# # visual confirmation
+# png(file="GrandTruth.png")
+# image(subject@data[,,1])
+# dev.off()
 
 context("### hosvd ###\n")
 set.seed(1234)
@@ -31,13 +31,13 @@ expect_identical(
     dim(dhosvdD$est))
 expect_true(abs(hosvdD$fnorm_resid - dhosvdD$fnorm_resid) <= 0.1)
 
-# visual confirmation
-png(file="HOSVD.png")
-image(hosvdD$est@data[,,1])
-dev.off()
-png(file="HOSVD_DelayedTensor.png")
-image(as.array(dhosvdD$est)[,,1])
-dev.off()
+# # visual confirmation
+# png(file="HOSVD.png")
+# image(hosvdD$est@data[,,1])
+# dev.off()
+# png(file="HOSVD_DelayedTensor.png")
+# image(as.array(dhosvdD$est)[,,1])
+# dev.off()
 
 context("### cp ###\n")
 set.seed(1234)
@@ -63,18 +63,18 @@ expect_identical(
     order(dcpD$all_resid[seq(l)]))
 expect_true(abs(cpD$fnorm_resid - dcpD$fnorm_resid) <= 1)
 
-# visual confirmation
-core <- array(0, dim=rep(length(cpD$lambdas), 3))
-for(i in seq_along(cpD$lambdas)){
-    core[i,i,i] <- cpD$lambdas[i]
-}
-dcore <- DelayedArray(core)
-png(file="CP.png")
-image(cpD$est@data[,,1])
-dev.off()
-png(file="CP_DelayedTensor.png")
-image(as.array(dcpD$est)[,,1])
-dev.off()
+# # visual confirmation
+# core <- array(0, dim=rep(length(cpD$lambdas), 3))
+# for(i in seq_along(cpD$lambdas)){
+#     core[i,i,i] <- cpD$lambdas[i]
+# }
+# dcore <- DelayedArray(core)
+# png(file="CP.png")
+# image(cpD$est@data[,,1])
+# dev.off()
+# png(file="CP_DelayedTensor.png")
+# image(as.array(dcpD$est)[,,1])
+# dev.off()
 
 context("### tucker ###\n")
 set.seed(1234)
@@ -107,13 +107,13 @@ expect_identical(
     order(dtuckerD$all_resid[seq(l)]))
 expect_true(abs(tuckerD$fnorm_resid - dtuckerD$fnorm_resid) <= 0.1)
 
-# visual confirmation
-png(file="TUCKER.png")
-image(tuckerD$est@data[,,1])
-dev.off()
-png(file="TUCKER_DelayedTensor.png")
-image(as.array(dtuckerD$est)[,,1])
-dev.off()
+# # visual confirmation
+# png(file="TUCKER.png")
+# image(tuckerD$est@data[,,1])
+# dev.off()
+# png(file="TUCKER_DelayedTensor.png")
+# image(as.array(dtuckerD$est)[,,1])
+# dev.off()
 
 context("### mpca ###\n")
 options(warn=-1)
@@ -136,13 +136,13 @@ expect_identical(
     order(dmpcaD$all_resid[seq(l)]))
 expect_true(abs(mpcaD$fnorm_resid - dmpcaD$fnorm_resid) <= 0.1)
 
-# visual confirmation
-png(file="MPCA.png")
-image(rTensor::ttl(mpcaD$Z_ext, mpcaD$U[1:2], ms=1:2)@data[,,1])
-dev.off()
-png(file="MPCA_DelayedTensor.png")
-image(as.array(ttl(dmpcaD$Z_ext, dmpcaD$U[1:2], ms=1:2))[,,1])
-dev.off()
+# # visual confirmation
+# png(file="MPCA.png")
+# image(rTensor::ttl(mpcaD$Z_ext, mpcaD$U[1:2], ms=1:2)@data[,,1])
+# dev.off()
+# png(file="MPCA_DelayedTensor.png")
+# image(as.array(ttl(dmpcaD$Z_ext, dmpcaD$U[1:2], ms=1:2))[,,1])
+# dev.off()
 
 context("### pvd ###\n")
 set.seed(1234)
@@ -171,13 +171,13 @@ expect_identical(
 )
 expect_true(abs(pvdD$fnorm_resid - dpvdD$fnorm_resid) <= 1)
 
-# visual confirmation
-png(file="PVD.png")
-image(pvdD$P %*% pvdD$V[[1]] %*% pvdD$D)
-dev.off()
-png(file="PVD_DelayedTensor.png")
-image(as.array(dpvdD$P %*% dpvdD$V[[1]] %*% dpvdD$D))
-dev.off()
+# # visual confirmation
+# png(file="PVD.png")
+# image(pvdD$P %*% pvdD$V[[1]] %*% pvdD$D)
+# dev.off()
+# png(file="PVD_DelayedTensor.png")
+# image(as.array(dpvdD$P %*% dpvdD$V[[1]] %*% dpvdD$D))
+# dev.off()
 
 context("### .is_zero_tensor ###\n")
 expect_identical(

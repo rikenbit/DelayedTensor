@@ -1,10 +1,7 @@
 # DelayedTensor
 Block-processed version of rTensor functions to perform tensor arithmetic and decomposition.
-
 All the calculations are actually performed and not registered as delayed operartion.
-
 DelayedTensor provides some generic function related to Tensor arithmetic/decompotision and dispatches it on the DelayedArray class.
-
 DelayedTensor also suppors Tensor contraction by einsum function, which is inspired by numpy einsum.
 
 Installation of Dependent Packages

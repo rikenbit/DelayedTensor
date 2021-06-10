@@ -78,7 +78,7 @@ it should be executed using the built-in matrix multiplication function
 (%\*%) prepared by the R, as shown below.
 
 ```{r Matrix Multiplication 2, echo=TRUE}
-C = A %*% B
+C <- A %*% B
 ```
 
 However, more complex operations than matrix multiplication

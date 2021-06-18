@@ -1,7 +1,7 @@
 Package: DelayedTensor
 Type: Package
 Title: R package for sparse and out-of-core arithmetic and decomposition of Tensor
-Version: 0.99.4
+Version: 0.99.5
 Authors@R: c(person("Koki", "Tsuyuzaki", role = c("aut", "cre"),
                 email = "k.t.the-answer@hotmail.co.jp"))
 Depends: R (>= 4.1.0)
@@ -23,6 +23,7 @@ Suggests: markdown,
     magrittr,
     dplyr,
     reticulate
+LazyDataCompression: bzip2
 Description: DelayedTensor operates Tensor arithmetic directly on DelayedArray object. DelayedTensor provides some generic function related to Tensor arithmetic/decompotision and dispatches it on the DelayedArray class. DelayedTensor also suppors Tensor contraction by einsum function, which is inspired by numpy einsum.
 License: Artistic-2.0
 biocViews: Software, Infrastructure, DataRepresentation, DimensionReduction

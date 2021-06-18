@@ -35,11 +35,11 @@ test_file("testthat/test_Einsum.R")
 # gc();gc() # comment out
 # } # comment out
 
-setAutoBlockSize(size=1E+8)
-test_file("testthat/test_Decomp.R")
+# setAutoBlockSize(size=1E+8)
+# test_file("testthat/test_Decomp.R")
 # test_file("testthat/test_Einsum_Py.R") # comment out
-source("testthat/test_Verbose.R")
-source("testthat/test_Sparse.R")
+# source("testthat/test_Verbose.R")
+# source("testthat/test_Sparse.R")
 
 # Profiling
 # source("testthat/test_SuperBig.R") # comment out

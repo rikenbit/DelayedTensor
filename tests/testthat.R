@@ -7,6 +7,7 @@ library("DelayedRandomArray")
 # library("Matrix") # comment out
 library("einsum")
 library("DelayedTensor")
+library("reticulate")
 library("testthat")
 
 # Setting

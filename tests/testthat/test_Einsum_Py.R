@@ -1,5 +1,3 @@
-library("reticulate")
-
 np <- import('numpy')
 
 # DelayedArray arrects

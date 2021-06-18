@@ -3,7 +3,7 @@
 \docType{data}
 \title{Matrix object of mouse mid brain data}
 \description{
-A matrix with 1000 rows (genes) * 1907 columns (cells).
+A matrix with 500 rows (genes) * 1907 columns (cells).
 }
 \usage{data(mouse_mid_brain)}
 \details{

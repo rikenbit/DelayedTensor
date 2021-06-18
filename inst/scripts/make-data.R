@@ -31,7 +31,7 @@ intersect(rownames(human), rownames(mouse)) -> common.name
 apply(human[common.name,], 1, var) -> var_human
 apply(mouse[common.name,], 1, var) -> var_mouse
 var_human + var_mouse -> var_both
-var_both[rank(1/var_both) <= 1000] -> high_var_genes
+var_both[rank(1/var_both) <= 500] -> high_var_genes
 human[names(high_var_genes), ] %>% as.matrix -> human_mid_brain
 mouse[names(high_var_genes), ] %>% as.matrix -> mouse_mid_brain
 

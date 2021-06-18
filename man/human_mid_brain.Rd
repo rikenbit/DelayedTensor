@@ -3,7 +3,7 @@
 \docType{data}
 \title{Matrix object of human mid brain data}
 \description{
-A matrix with 1000 rows (genes) * 1977 columns (cells).
+A matrix with 500 rows (genes) * 1977 columns (cells).
 }
 \usage{data(human_mid_brain)}
 \details{

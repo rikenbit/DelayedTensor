@@ -44,9 +44,9 @@ setAutoBlockSize(1E+8)
 
 Tensor decomposition models decompose multiple factor matrices and core tensor.
 Each factor matrix means the patterns of each mode
-and used for the visualization and the down-stream analysis.
+and is used for the visualization and the downstream analysis.
 Core tensor means the intensity of the patterns
-and used to decide which patterns are informative.
+and is used to decide which patterns are informative.
 
 We reimplemented some of the tensor decomposition functions of
 `r CRANpkg("rTensor")` using block processing of
@@ -119,9 +119,9 @@ str(out_cp)
 
 ## Multilinear Principal Component Analysis (MPCA)
 
-MPCA is a kind of Tucker decompotition and when the order of tensor is 3,
+MPCA is a kind of Tucker decomposition and when the order of tensor is 3,
 this is also known as the
-Generalized Low Rank Approximation of Matrices (GLRAM).
+Generalized Low-Rank Approximation of Matrices (GLRAM).
 For the details, check the `mpca` function of `r CRANpkg("rTensor")`.
 
 ```{r Tensor Decomposition 3, echo=TRUE}

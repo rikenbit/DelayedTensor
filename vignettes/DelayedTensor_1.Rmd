@@ -30,7 +30,7 @@ BiocStyle::markdown()
 # Introduction
 ## Heterogenous Biological Data
 
-Biological systems have very complicated structure like this
+Biological systems have very complicated structures like this
 figure^[https://f1000research.com/slides/9-1260].
 
 ![Figure 1: Heterogenous Biological Data](Figure1_1.png)
@@ -38,15 +38,15 @@ figure^[https://f1000research.com/slides/9-1260].
 For example, in the cell, DNA sequences are folded in cellular nucleus,
 RNA molecules are transcripted from the DNA,
 proteins are translated from the RNAs,
-and finally the proteins are related to cellular functions.
-Outside of the cell, there are also many signals like bacterial infection,
-adding chemical reagent, drug, life style and so on.
-The change of these molecular types/phenomena finally causes phenotype
+and finally, the proteins are related to cellular functions.
+Outside of the cell, there are also many signals like a bacterial infection,
+adding chemical reagents, drugs, lifestyle, and so on.
+The change of these molecular types/phenomena finally causes the phenotype
 such as disease, BMI, and morphology.
 It is not possible to measure all molecular types or phenomena simultaneously,
 so one or two of them are chosen and exhaustively measured.
 This approach is called omics study and widely used.
-For example, genomics measure all DNA sequences and transcriptomics measure
+For example, genomics measure all DNA sequences, and transcriptomics measure
 all RNA molecules.
 
 There is a need for a framework that can handle and analyze such
@@ -62,7 +62,7 @@ representation^[https://f1000research.com/slides/9-1260].
 For example, a scalar value, a vector, and a matrix are also called 0th-order
 tensor, 1st-order tensor, and 2nd-order tensor, respectively.
 If a data has three "modes" (1. height, 2. width, and 3. depth),
-it is called 3rd-order tensor.
+it is called a 3rd-order tensor.
 
 ![Figure 2: What is Tensor](Figure1_2.png)
 
@@ -71,7 +71,7 @@ but in most cases, the term tensor implies 3rd-order or higher-order tensor.
 
 ## What is Tensor Decomposition
 
-Tensor decomposition is the extension of the matrix decomposition.
+Tensor decomposition is the extension of matrix decomposition.
 If we have a third-order tensor,
 gene times tissue times condition,
 using tensor decomposition, we can extract a small number of
@@ -92,11 +92,11 @@ mode-wise statistics, and various tensor products.
 These operations are essential in the analysis of tensor data and
 the implementation of tensor decomposition algorithms.
 Although the standard `array` of R language can express
-increasing orders of tensors, it do not provide tensor-specific operations.
+increasing orders of tensors, it does not provide tensor-specific operations.
 Therefore, many R users manipulate tensor data by using
 the functions implemented in the `r CRANpkg("rTensor")` package for now.
 Although `r CRANpkg("rTensor")` is very useful,
-it assumes the input object to be an on-memory array.
+it assumes the input object to be an in-memory array.
 On the other hand, tensors can easily become huge
 as the order and the size of each mode increase,
 and may no longer fit in memory.

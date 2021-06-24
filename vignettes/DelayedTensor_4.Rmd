@@ -34,7 +34,7 @@ It was originally introduced by
 `Numpy`^[https://numpy.org/doc/stable/reference/generated/numpy.einsum.html]
 package of Python but similar tools have been implemented in other languages
 (e.g. R, Julia) inspired by `Numpy`.
-In this vignette, we willl use CRAN `r CRANpkg("einsum")` package first.
+In this vignette, we will use CRAN `r CRANpkg("einsum")` package first.
 
 `einsum` is named after
 Einstein summation^[https://en.wikipedia.org/wiki/Einstein_notation]
@@ -102,7 +102,7 @@ C <- einsum('ij,jk->ik', A, B)
 CRAN `r CRANpkg("einsum")` is easy to use because the syntax is almost
 the same as that of `Numpy`'s `einsum`,
 except that it prohibits the implicit modes that do not use '->'.
-It is extreamly fast because the internal calculation
+It is extremely fast because the internal calculation
 is actually performed by C++.
 When the input tensor is huge, however,
 it is not scalable because it assumes that the input is R's standard array.
@@ -188,7 +188,7 @@ DelayedTensor::einsum('iii->i', darrD)
 
 ## Multiplication
 
-By using multiple array or `r Biocpkg("DelayedArray")` object as input and
+By using multiple arrays or `r Biocpkg("DelayedArray")` objects as input and
 writing "," on the right side of ->,
 multiplication will be performed.
 
@@ -214,7 +214,7 @@ DelayedTensor::einsum('ijk,ijk->ijk', darrE, darrE)
 
 ### Outer Product
 
-Outer product can also be implemented in `einsum`,
+The outer product can also be implemented in `einsum`,
 in which the subscripts in the input array are all different,
 and all of them are kept.
 
@@ -278,7 +278,7 @@ DelayedTensor::einsum('ijk->k', darrE)
 
 ### Mode-wise Summation
 
-These are the same as what `modeSum` function does.
+These are the same as what the `modeSum` function does.
 
 ```{r Mode Sum 1, echo=TRUE}
 einsum::einsum('ijk->ij', arrE)
@@ -322,7 +322,7 @@ DelayedTensor::einsum('ijk->jki', darrD)
 
 ## Multiplication + Summation
 
-Some examples of combining Multiplication and Summation is shown below.
+Some examples of combining Multiplication and Summation are shown below.
 
 ### Inner Product (Squared Frobenius Norm)
 
@@ -346,8 +346,8 @@ DelayedTensor::einsum('ijk,ijk->', darrE, darrE)
 
 ### Contracted Product
 
-Inner product is an operation that eliminates all subscripts,
-while outer product is an operation that leaves all subscripts intact.
+The inner product is an operation that eliminates all subscripts,
+while the outer product is an operation that leaves all subscripts intact.
 In the middle of the two, the operation that eliminates some subscripts
 while keeping others by summing them is called contracted product.
 
@@ -358,7 +358,7 @@ DelayedTensor::einsum('ijk,ijk->jk', darrE, darrE)
 
 ### Matrix Multiplication
 
-Matrix Multiplication is considered as a contracted product.
+Matrix Multiplication is considered a contracted product.
 
 ```{r Matrix Multiplication, echo=TRUE}
 einsum::einsum('ij,jk->ik', arrC, t(arrC))
@@ -367,7 +367,7 @@ DelayedTensor::einsum('ij,jk->ik', darrC, t(darrC))
 
 ## Multiplication + Permutation
 
-Some examples of combining Multiplication and Permutation is shown below.
+Some examples of combining Multiplication and Permutation are shown below.
 
 ```{r Multiplication and Permutation 1, echo=TRUE}
 einsum::einsum('ij,ij->ji', arrC, arrC)
@@ -381,7 +381,7 @@ DelayedTensor::einsum('ijk,ijk->jki', darrE, darrE)
 
 ## Summation + Permutation
 
-Some examples of combining Summation and Permutation is shown below.
+Some examples of combining Summation and Permutation are shown below.
 
 ```{r Summation and Permutation, echo=TRUE}
 einsum::einsum('ijk->ki', arrE)
@@ -390,7 +390,7 @@ DelayedTensor::einsum('ijk->ki', darrE)
 
 ## Multiplication + Summation + Permutation
 
-Finally, we will show more complex example,
+Finally, we will show a more complex example,
 combining Multiplication, Summation, and Permutation.
 
 ```{r Multiplication, Summation, and Permutation, echo=TRUE}

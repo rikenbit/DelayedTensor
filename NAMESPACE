@@ -9,8 +9,6 @@ importFrom(DelayedRandomArray, RandomNormArray)
 importFrom(irlba, irlba)
 importFrom(Matrix, sparseMatrix)
 importFrom(einsum, einsum)
-import(BiocStyle)
-import(knitr)
 
 # Generics.R
 exportMethods(unfold)

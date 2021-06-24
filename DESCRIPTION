@@ -1,7 +1,7 @@
 Package: DelayedTensor
 Type: Package
 Title: R package for sparse and out-of-core arithmetic and decomposition of Tensor
-Version: 0.99.7
+Version: 0.99.8
 Authors@R: c(person("Koki", "Tsuyuzaki", role = c("aut", "cre"),
                 email = "k.t.the-answer@hotmail.co.jp"))
 Depends: R (>= 4.1.0)
@@ -15,15 +15,20 @@ Imports: methods,
     irlba,
     Matrix,
     einsum,
-    BiocStyle,
-    knitr
 Suggests: markdown,
     rmarkdown,
+    BiocStyle,
+    knitr,
     testthat,
     magrittr,
     dplyr,
     reticulate
-Description: DelayedTensor operates Tensor arithmetic directly on DelayedArray object. DelayedTensor provides some generic function related to Tensor arithmetic/decompotision and dispatches it on the DelayedArray class. DelayedTensor also suppors Tensor contraction by einsum function, which is inspired by numpy einsum.
+Description: DelayedTensor operates Tensor arithmetic directly on
+    DelayedArray object. DelayedTensor provides some generic function related to
+    Tensor arithmetic/decompotision and dispatches it on the DelayedArray class.
+    DelayedTensor also suppors Tensor contraction by einsum function,
+    which is inspired by numpy einsum.
 License: Artistic-2.0
 biocViews: Software, Infrastructure, DataRepresentation, DimensionReduction
 VignetteBuilder: knitr
+BugReports: https://github.com/rikenbit/DelayedTensor/issues

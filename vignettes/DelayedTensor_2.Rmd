@@ -48,7 +48,7 @@ Note that the sparse mode is experimental.
 Whether it contributes to higher speed and lower memory is quite dependent
 on the sparsity of the `r Biocpkg("DelayedArray")`,
 and the current implementation does not recognize the block size,
-which may cause out-of-memory errors, when the data is extreamly huge.
+which may cause out-of-memory errors, when the data is extremely huge.
 
 Here, we specify `as.sparse` as `FALSE`
 (this is also the default value for now).
@@ -95,7 +95,7 @@ matrix.
 
 ![Figure 1: Unfold/Fold Operasions](Figure2_1.png)
 
-In `unfold`, `row_idx`/`col_idx` are specified to set which modes are used
+In `unfold`, `row_idx` and `col_idx` are specified to set which modes are used
 as the row/column.
 
 ```{r Unfold/Fold operations 1, echo=TRUE}
@@ -117,9 +117,9 @@ dmat1_to_darr1
 identical(as.array(darr1), as.array(dmat1_to_darr1))
 ```
 
-There are some wrapper fuctions of `unfold` and `fold`.
+There are some wrapper functions of `unfold` and `fold`.
 
-For example, in `k_unfold`, mode `m` is used as the row and the other modes
+For example, in `k_unfold`, mode `m` is used as the row, and the other modes
 are is used as the column.
 
 `k_fold` is the inverse operation of `k_unfold`.
@@ -138,7 +138,7 @@ dmat4_to_darr1 <- k_fold(dmat4, m=3, modes=dim(darr1))
 identical(as.array(darr1), as.array(dmat4_to_darr1))
 ```
 
-In `rs_unfold`, mode `m` is used as the row and the other modes
+In `rs_unfold`, mode `m` is used as the row, and the other modes
 are is used as the column.
 
 `rs_fold` and `rs_unfold` also perform the same operations.
@@ -222,8 +222,8 @@ DelayedTensor::innerProd(darr1, darr2)
 
 ## Outer Product
 
-Inner product multiplies two tensors and collapsed to 0D tensor (norm).
-On the hand, outer product is an operation that leaves all subscripts intact.
+Inner product multiplies two tensors and collapses to 0D tensor (norm).
+On the other hand, the outer product is an operation that leaves all subscripts intact.
 
 ![Figure 4: Outer Product](Figure2_4.png)
 
@@ -326,7 +326,7 @@ Suppose a tensor $A \in \Re ^{I \times J}$ and
 a tensor $B \in \Re ^{K \times L}$.
 
 Kronecker product is defined as all the possible combination of element-wise
-product and the dimensions of output tensor is ${IK \times JL}$.
+product and the dimensions of output tensor are ${IK \times JL}$.
 
 ![Figure 8: Kronecker Product](Figure2_8.png)
 

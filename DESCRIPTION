@@ -1,7 +1,7 @@
 Package: DelayedTensor
 Type: Package
 Title: R package for sparse and out-of-core arithmetic and decomposition of Tensor
-Version: 0.99.9
+Version: 0.99.10
 Authors@R: c(person("Koki", "Tsuyuzaki", role = c("aut", "cre"),
                 email = "k.t.the-answer@hotmail.co.jp"))
 Depends: R (>= 4.1.0)

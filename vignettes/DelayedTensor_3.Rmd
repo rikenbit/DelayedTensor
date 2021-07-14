@@ -31,6 +31,7 @@ BiocStyle::markdown()
 ```{r Setting, echo=TRUE}
 suppressPackageStartupMessages(library("DelayedTensor"))
 suppressPackageStartupMessages(library("DelayedArray"))
+suppressPackageStartupMessages(library("HDF5Array"))
 suppressPackageStartupMessages(library("DelayedRandomArray"))
 
 darr <- RandomUnifArray(c(3,4,5))
@@ -38,6 +39,8 @@ darr <- RandomUnifArray(c(3,4,5))
 setVerbose(FALSE)
 setSparse(FALSE)
 setAutoBlockSize(1E+8)
+tmpdir <- tempdir()
+setHDF5DumpDir(tmpdir)
 ```
 
 # Tensor Decomposition

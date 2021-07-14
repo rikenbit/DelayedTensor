@@ -32,6 +32,7 @@ BiocStyle::markdown()
 ```{r Setting 1, echo=TRUE}
 suppressPackageStartupMessages(library("DelayedTensor"))
 suppressPackageStartupMessages(library("DelayedArray"))
+suppressPackageStartupMessages(library("HDF5Array"))
 suppressPackageStartupMessages(library("DelayedRandomArray"))
 
 darr1 <- RandomUnifArray(c(2,3,4))
@@ -67,7 +68,7 @@ Here we specify `as.verbose` as `FALSE`
 DelayedTensor::setVerbose(as.verbose=FALSE)
 ```
 
-Finally, the block size of block processing is specified by `setAutoBlockSize`.
+The block size of block processing is specified by `setAutoBlockSize`.
 When the sparse mode is off, all the functions of `r Biocpkg("DelayedTensor")`
 are performed as block processing,
 in which each block vector/matrix/tensor is expanded to memory space
@@ -79,12 +80,24 @@ Here, we specify the block size as `1E+8`.
 setAutoBlockSize(size=1E+8)
 ```
 
-These specified values are also extracted by each getter function.
+Finally, the temporal directory to store the intermediate HDF5 files during running `r Biocpkg("DelayedTensor")` is specified by `setHDF5DumpDir`.
+
+Note that in many systems the `/var` directory has the storage limitation, so if there is no enough space, user should specify the other directory.
 
 ```{r Setting 5, echo=TRUE}
+# tmpdir <- paste(sample(c(letters,1:9), 10), collapse="")
+# dir.create(tmpdir, recursive=TRUE))
+tmpdir <- tempdir()
+setHDF5DumpDir(tmpdir)
+```
+
+These specified values are also extracted by each getter function.
+
+```{r Setting 6, echo=TRUE}
 DelayedTensor::getSparse()
 DelayedTensor::getVerbose()
 getAutoBlockSize()
+getHDF5DumpDir()
 ```
 
 # Tensor Arithmetic Operations

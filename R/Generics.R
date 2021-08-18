@@ -411,7 +411,7 @@ setMethod("kronecker",
     idx1 <- idx1_idx2$idx1
     idx2 <- idx1_idx2$idx2
     if(options()$delayedtensor.sparse){
-        new_modes <- dim(darr1)*dim(darr2)
+        new_modes <- dim(darr_grid_1[[idx1]])*dim(darr_grid_2[[idx2]])
         a <- read_block(darr1, darr_grid_1[[idx1]], as.sparse=TRUE)
         b <- read_block(darr2, darr_grid_2[[idx2]], as.sparse=TRUE)
         if(length(a@nzdata)*length(b@nzdata) == 0){

@@ -21,7 +21,7 @@ darr <- DelayedArray(tnsr@data)
 mat <- matrix(runif(50), nrow=10, ncol=5)
 
 context("### list_rep ###\n")
-expect_identical(
+expect_equal(
     list_rep(tnsr, 3),
     list(tnsr, tnsr, tnsr))
 

@@ -6,10 +6,10 @@ context("### svd ###\n")
 for(k in seq(min(dim(dmat)))){
 	out_m <- svd(mat, nu=k, nv=k)
 	out_d <- .svd(dmat, k=k)
-	expect_identical(
+	expect_equal(
 		dim(out_m$u),
 		dim(out_d$u))
-	expect_identical(
+	expect_equal(
 		dim(out_m$v),
 		dim(out_d$v))
 }

@@ -122,7 +122,13 @@
         if(limit <= block.size){
             spacings[i] <- new_modes[i]
         }else{
-            spacings[i] <- 1
+            if(i == 1){
+                idx <- 1
+            }else{
+                idx <- seq_len(i-1)
+            }
+            # spacings[i] <- 1
+            spacings[i] <- max(1, floor(block.size / prod(new_modes[idx])))
         }
     }
     spacings

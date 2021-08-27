@@ -20,13 +20,13 @@ hosvdD <- rTensor::hosvd(subject, ranks=c(10,10,10))
 set.seed(1234)
 dhosvdD <- hosvd(dsubject, ranks=c(10,10,10))
 
-expect_identical(
+expect_equal(
     dim(hosvdD$Z@data),
     dim(dhosvdD$Z))
-expect_identical(
+expect_equal(
     lapply(hosvdD$U, dim),
     lapply(dhosvdD$U, dim))
-expect_identical(
+expect_equal(
     dim(hosvdD$est@data),
     dim(dhosvdD$est))
 expect_true(abs(hosvdD$fnorm_resid - dhosvdD$fnorm_resid) <= 0.1)
@@ -45,20 +45,20 @@ cpD <- rTensor::cp(subject, num_components=10, max_iter=20)
 set.seed(1234)
 dcpD <- cp(dsubject, num_components=10, max_iter=20)
 
-expect_identical(
+expect_equal(
     length(cpD$lambdas),
     length(dcpD$lambdas))
-expect_identical(
+expect_equal(
     lapply(cpD$U, dim),
     lapply(dcpD$U, dim))
-expect_identical(
+expect_equal(
     dim(cpD$est),
     dim(dcpD$est))
-expect_identical(
+expect_equal(
     cpD$norm_percent >= 0,
     dcpD$norm_percent >= 0)
 l <- min(length(cpD$all_resid), length(dcpD$all_resid))
-expect_identical(
+expect_equal(
     order(cpD$all_resid[seq(l)]),
     order(dcpD$all_resid[seq(l)]))
 expect_true(abs(cpD$fnorm_resid - dcpD$fnorm_resid) <= 1)
@@ -81,28 +81,28 @@ set.seed(1234)
 tuckerD <- rTensor::tucker(subject, ranks=c(10,10,10), max_iter=20)
 set.seed(1234)
 dtuckerD <- tucker(dsubject, ranks=c(10,10,10), max_iter=20)
-expect_identical(
+expect_equal(
     dim(tuckerD$Z),
     dim(dtuckerD$Z)
 )
-expect_identical(
+expect_equal(
     lapply(tuckerD$U, dim),
     lapply(dtuckerD$U, dim)
 )
-expect_identical(
+expect_equal(
     tuckerD$conv,
     dtuckerD$conv
 )
-expect_identical(
+expect_equal(
     dim(tuckerD$est),
     dim(dtuckerD$est)
 )
-expect_identical(
+expect_equal(
     tuckerD$norm_percent >= 0,
     dtuckerD$norm_percent >= 0
 )
 l <- min(length(tuckerD$all_resid), length(dtuckerD$all_resid))
-expect_identical(
+expect_equal(
     order(tuckerD$all_resid[seq(l)]),
     order(dtuckerD$all_resid[seq(l)]))
 expect_true(abs(tuckerD$fnorm_resid - dtuckerD$fnorm_resid) <= 0.1)
@@ -122,16 +122,16 @@ mpcaD <- rTensor::mpca(subject, ranks=c(10,10), max_iter=20)
 set.seed(1234)
 dmpcaD <- mpca(dsubject, ranks=c(10,10), max_iter=20)
 options(warn=1)
-expect_identical(
+expect_equal(
     mpcaD$conv,
     dmpcaD$conv
 )
-expect_identical(
+expect_equal(
     mpcaD$norm_percent >= 0,
     dmpcaD$norm_percent >= 0
 )
 l <- min(length(mpcaD$all_resid), length(dmpcaD$all_resid))
-expect_identical(
+expect_equal(
     order(mpcaD$all_resid[seq(l)]),
     order(dmpcaD$all_resid[seq(l)]))
 expect_true(abs(mpcaD$fnorm_resid - dmpcaD$fnorm_resid) <= 0.1)
@@ -149,23 +149,23 @@ set.seed(1234)
 pvdD <- rTensor::pvd(subject, uranks=rep(5,10), wranks=rep(8,10), a=5, b=8)
 set.seed(1234)
 dpvdD <- pvd(dsubject, uranks=rep(5,10), wranks=rep(8,10), a=5, b=8)
-expect_identical(
+expect_equal(
     dim(pvdD$P),
     dim(dpvdD$P)
 )
-expect_identical(
+expect_equal(
     dim(pvdD$D),
     dim(dpvdD$D)
 )
-expect_identical(
+expect_equal(
     dim(pvdD$V),
     dim(dpvdD$V)
 )
-expect_identical(
+expect_equal(
     dim(pvdD$est),
     dim(dpvdD$est)
 )
-expect_identical(
+expect_equal(
     pvdD$norm_percent >= 0,
     dpvdD$norm_percent >= 0
 )
@@ -180,6 +180,6 @@ expect_true(abs(pvdD$fnorm_resid - dpvdD$fnorm_resid) <= 1)
 # dev.off()
 
 context("### .is_zero_tensor ###\n")
-expect_identical(
+expect_equal(
 	rTensor:::.is_zero_tensor(tnsr),
 	.is_zero_tensor(darr))

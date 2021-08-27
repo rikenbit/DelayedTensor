@@ -605,7 +605,8 @@ setMethod("fold",
     num_modes <- length(modes)
     # Reshaping
     new_modes <- as.integer(c(modes[row_idx], modes[col_idx]))
-    sink <- .reshapeIncNumbers1D(vec(mat), new_modes)
+    vecobj <- .realize_and_return(vec(mat))
+    sink <- .reshapeIncNumbers1D(vecobj, new_modes)
     #rearranges into array
     iperm <- match(seq_len(num_modes), c(row_idx, col_idx))
     sink <- aperm(sink, iperm)

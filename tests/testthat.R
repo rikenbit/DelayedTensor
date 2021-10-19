@@ -1,5 +1,5 @@
 library("DelayedArray")
-# library("HDF5Array") # comment out
+library("HDF5Array")
 # library("BiocSingular") # comment out
 library("rTensor")
 library("DelayedRandomArray")
@@ -14,6 +14,7 @@ library("testthat")
 options(testthat.use_colours = FALSE)
 options(delayedtensor.sparse = FALSE)
 options(delayedtensor.verbose = FALSE)
+setHDF5DumpCompressionLevel(level=9L)
 source("testthat/test_Einsum_objects.R")
 
 # source("../R/Decomp.R") # comment out

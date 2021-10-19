@@ -30,5 +30,7 @@ Description: DelayedTensor operates Tensor arithmetic directly on
     which is inspired by numpy einsum.
 License: Artistic-2.0
 biocViews: Software, Infrastructure, DataRepresentation, DimensionReduction
+LazyData: true
+LazyDataCompression: xz
 VignetteBuilder: knitr
 BugReports: https://github.com/rikenbit/DelayedTensor/issues

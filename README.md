@@ -1,3 +1,6 @@
+[![DOI](https://zenodo.org/badge/237884779.svg)](https://zenodo.org/badge/latestdoi/237884779)
+[![](https://img.shields.io/badge/release%20version-1.2.0-green.svg)](https://www.bioconductor.org/packages/release/bioc/html/DelayedTensor.html)
+
 # DelayedTensor
 Block-processed version of rTensor functions to perform tensor arithmetic and decomposition.
 All the calculations are actually performed and not registered as delayed operartion.

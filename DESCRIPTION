@@ -1,17 +1,19 @@
 Package: DelayedTensor
 Type: Package
 Title: R package for sparse and out-of-core arithmetic and decomposition of Tensor
-Version: 0.99.12
+Version: 1.11.1
 Authors@R: c(person("Koki", "Tsuyuzaki", role = c("aut", "cre"),
                 email = "k.t.the-answer@hotmail.co.jp"))
 Depends: R (>= 4.1.0)
 Imports: methods,
     utils,
-    DelayedArray,
+    S4Arrays,
+    SparseArray,
+    DelayedArray (>= 0.31.8),
     HDF5Array,
     BiocSingular,
     rTensor,
-    DelayedRandomArray,
+    DelayedRandomArray (>= 1.13.1),
     irlba,
     Matrix,
     einsum,

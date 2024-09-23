@@ -1,5 +1,7 @@
 importFrom(methods, as, is)
 importFrom(utils, setTxtProgressBar, tail, txtProgressBar)
+import(S4Arrays)
+import(SparseArray)
 import(DelayedArray)
 import(HDF5Array)
 importClassesFrom(DelayedArray, DelayedArray)

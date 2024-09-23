@@ -265,10 +265,7 @@ setMethod("vec", signature(darr="DelayedArray"),
 .block_vec <- function(darr, darr_grid, bid){
     if(options()$delayedtensor.sparse){
         v <- read_block(darr, darr_grid[[bid]], as.sparse=TRUE)
-        out <- SparseArraySeed(prod(dim(v)))
-        out@nzdata <- v@nzdata
-        out@nzindex <- as.matrix(Mindex2Lindex(v@nzindex, dim(v)))
-        sparse2dense(out)
+        as.array(SVT_SparseArray(v, dim=length(v)))
     }else{
         v <- read_block(darr, darr_grid[[bid]], as.sparse=FALSE)
         dim(v) <- prod(dim(v))
@@ -317,10 +314,10 @@ setMethod("hadamard",
     if(options()$delayedtensor.sparse){
         a <- read_block(darr1, sink_grid[[bid]], as.sparse=TRUE)
         b <- read_block(darr2, sink_grid[[bid]], as.sparse=TRUE)
-        idx1 <- apply(a@nzindex, 1, function(x){
+        idx1 <- apply(a@nzcoo, 1, function(x){
             paste(x, collapse="-")
         })
-        idx2 <- apply(b@nzindex, 1, function(x){
+        idx2 <- apply(b@nzcoo, 1, function(x){
             paste(x, collapse="-")
         })
         common_idx <- intersect(idx1, idx2)
@@ -330,13 +327,13 @@ setMethod("hadamard",
             target <- vapply(common_idx, function(x){
                 which(idx1 == x)
             }, 0L)
-            out <- SparseArraySeed(dim(darr1))
+            out <- COO_SparseArray(dim(darr1))
             # Hadamard Product
             nzdata <- a@nzdata[target] * b@nzdata[target]
             if(length(common_idx) == 1){
-                out@nzindex <- t(a@nzindex[target, ])
+                out@nzcoo <- t(a@nzcoo[target, ])
             }else{
-                out@nzindex <- a@nzindex[target, ]
+                out@nzcoo <- a@nzcoo[target, ]
             }
             out@nzdata <- as.vector(nzdata)
             DelayedArray(out)
@@ -417,10 +414,10 @@ setMethod("kronecker",
         if(length(a@nzdata)*length(b@nzdata) == 0){
             .array(new_modes)
         }else{
-            out <- SparseArraySeed(new_modes)
-            nzindex <- .kroneckerIDX(a, b)
+            out <- COO_SparseArray(new_modes)
+            nzcoo <- .kroneckerIDX(a, b)
             nzdata <- as.vector(outer(a@nzdata, b@nzdata))
-            out@nzindex <- nzindex
+            out@nzcoo <- nzcoo
             out@nzdata <- as.vector(nzdata)
             DelayedArray(out)
         }
@@ -448,8 +445,8 @@ setMethod("kronecker",
 }
 
 .kroneckerIDX <- function(a, b){
-    idx <- apply(b@nzindex, 1, function(x){
-        x + (dim(b) * t(a@nzindex - 1))
+    idx <- apply(b@nzcoo, 1, function(x){
+        x + (dim(b) * t(a@nzcoo - 1))
     })
     idx <- as.array(idx)
     dim(idx) <- c(.ndim(b), length(idx)/.ndim(b))
@@ -524,16 +521,16 @@ setMethod("khatri_rao",
         new_modes <- c(nrow(darr1)*nrow(darr2), ncol(darr1))
         a <- read_block(darr1, darr_grid_1[[idx1]], as.sparse=TRUE)
         b <- read_block(darr2, darr_grid_2[[idx2]], as.sparse=TRUE)
-        common_cols <- unique(intersect(a@nzindex[,2], b@nzindex[,2]))
+        common_cols <- unique(intersect(a@nzcoo[,2], b@nzcoo[,2]))
         check1 <- length(a@nzdata)*length(b@nzdata) == 0
         check2 <- length(common_cols) == 0
         if(check1 || check2){
             .array(new_modes)
         }else{
-            out <- SparseArraySeed(new_modes)
-            nzindex <- .khatri_raoIDX(a, b, common_cols)
+            out <- COO_SparseArray(new_modes)
+            nzcoo <- .khatri_raoIDX(a, b, common_cols)
             nzdata <- .khatri_raoVALUE(a, b, common_cols)
-            out@nzindex <- nzindex
+            out@nzcoo <- nzcoo
             out@nzdata <- as.vector(nzdata)
             DelayedArray(out)
         }
@@ -554,15 +551,15 @@ setMethod("khatri_rao",
 
 .khatri_raoIDX <- function(a, b, common_cols){
     x <- unlist(lapply(common_cols, function(xx){
-        target1 <- which(a@nzindex[,2] == xx)
-        target2 <- which(b@nzindex[,2] == xx)
-        unlist(lapply(nrow(b) * (a@nzindex[target1,1] - 1), function(xxx){
-            b@nzindex[target2,1] + xxx
+        target1 <- which(a@nzcoo[,2] == xx)
+        target2 <- which(b@nzcoo[,2] == xx)
+        unlist(lapply(nrow(b) * (a@nzcoo[target1,1] - 1), function(xxx){
+            b@nzcoo[target2,1] + xxx
         }))
     }))
     y <- unlist(lapply(common_cols, function(xx){
-        target1 <- which(a@nzindex[,2] == xx)
-        target2 <- which(b@nzindex[,2] == xx)
+        target1 <- which(a@nzcoo[,2] == xx)
+        target2 <- which(b@nzcoo[,2] == xx)
         rep(xx, length(target1)*length(target2))
     }))
     cbind(x, y)
@@ -570,8 +567,8 @@ setMethod("khatri_rao",
 
 .khatri_raoVALUE <- function(a, b, common_cols){
     unlist(lapply(common_cols, function(xx){
-        target1 <- which(a@nzindex[,2] == xx)
-        target2 <- which(b@nzindex[,2] == xx)
+        target1 <- which(a@nzcoo[,2] == xx)
+        target2 <- which(b@nzcoo[,2] == xx)
         as.vector(outer(b@nzdata[target2], a@nzdata[target1]))
     }))
 }
@@ -716,14 +713,14 @@ setMethod("diag", signature(darr="DelayedArray"),
 .diag <- function(darr){
     num_modes <- .ndim(darr)
     min.s <- min(dim(darr))
-    out <- SparseArraySeed(min.s)
+    out <- COO_SparseArray(min.s)
     cmd <- paste0("for(i in seq_len(min.s)){",
         "out@nzdata[i] <- darr[",
             paste(rep("i", length=num_modes), collapse=","), "]}")
     eval(parse(text=cmd))
-    out@nzindex <-  t(vapply(seq_len(min.s),
+    out@nzcoo <-  t(vapply(seq_len(min.s),
         function(x){rep(x, num_modes)}, rep(1L, num_modes)))
-    out <- sparse2dense(out)
+    out <- as.array(out)
     DelayedArray(out)
 }
 

@@ -47,10 +47,10 @@
     dim_sink_viewport <- as.integer(dim(sink_viewport))
     if(options()$delayedtensor.sparse){
         v <- read_block(vecobj, vec_grid[[bid]], as.sparse=TRUE)
-        out <- SparseArraySeed(dim_sink_viewport)
+        out <- COO_SparseArray(dim_sink_viewport)
         out@nzdata <- v@nzdata
-        out@nzindex <- Lindex2Mindex(v@nzindex[,1], dim_sink_viewport)
-        sparse2dense(out)
+        out@nzcoo <- Lindex2Mindex(v@nzcoo[,1], dim_sink_viewport)
+        as.array(out)
     }else{
         v <- read_block(vecobj, vec_grid[[bid]], as.sparse=FALSE)
         dim(v) <- dim_sink_viewport

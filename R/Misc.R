@@ -128,9 +128,9 @@ DelayedDiagonalArray <- function(shape, value){
     if(missing(value)){
         value <- rep(1L, num_modes)
     }
-    out <- SparseArraySeed(shape)
+    out <- COO_SparseArray(shape)
     out@nzdata <- as.vector(value)
-    out@nzindex <-  t(vapply(seq_len(min.s),
+    out@nzcoo <-  t(vapply(seq_len(min.s),
         function(x){rep(x, num_modes)}, rep(1L, num_modes)))
     DelayedArray(out)
 }

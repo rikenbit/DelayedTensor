@@ -24,7 +24,8 @@ Suggests: markdown,
     testthat,
     magrittr,
     dplyr,
-    reticulate
+    reticulate,
+    TileDBArray
 Description: DelayedTensor operates Tensor arithmetic directly on
     DelayedArray object. DelayedTensor provides some generic function related to
     Tensor arithmetic/decompotision and dispatches it on the DelayedArray class.

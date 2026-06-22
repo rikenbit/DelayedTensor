@@ -28,12 +28,16 @@ expect_equal(
 context("### modebind_list/rbind_list ###\n")
 expect_equal(
     as.array(rbind(dlizt[[1]], dlizt[[2]], dlizt[[3]])),
+    as.array(modebind_list(dlizt, m=1)))
+expect_equal(
     as.array(modebind_list(dlizt, m=1)),
     as.array(rbind_list(dlizt)))
 
 context("### modebind_list/cbind_list ###\n")
 expect_equal(
     as.array(cbind(dlizt[[1]], dlizt[[2]], dlizt[[3]])),
+    as.array(modebind_list(dlizt, m=2)))
+expect_equal(
     as.array(modebind_list(dlizt, m=2)),
     as.array(cbind_list(dlizt)))
 

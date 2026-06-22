@@ -90,6 +90,8 @@ darr4_2 <- fold(dmatT4,
     row_idx=1, col_idx=2:4, modes=c(2,3,4,5))
 expect_equal(
     arr4,
+    tnsr4_2@data)
+expect_equal(
     tnsr4_2@data,
     as.array(darr4_2))
 
@@ -101,6 +103,8 @@ darr4_3 <- fold(dmatT4,
     row_idx=2, col_idx=c(3,1,4), modes=c(2,3,4,5))
 expect_equal(
     arr4,
+    tnsr4_3@data)
+expect_equal(
     tnsr4_3@data,
     as.array(darr4_3))
 
@@ -112,6 +116,8 @@ darr4_4 <- fold(dmatT4,
     row_idx=3, col_idx=c(2,1,4), modes=c(2,3,4,5))
 expect_equal(
     arr4,
+    tnsr4_4@data)
+expect_equal(
     tnsr4_4@data,
     as.array(darr4_4))
 
@@ -123,6 +129,8 @@ darr4_5 <- fold(dmatT4,
     row_idx=4, col_idx=c(3,2,1), modes=c(2,3,4,5))
 expect_equal(
     arr4,
+    tnsr4_5@data)
+expect_equal(
     tnsr4_5@data,
     as.array(darr4_5))
 

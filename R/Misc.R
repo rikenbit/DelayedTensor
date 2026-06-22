@@ -10,22 +10,20 @@ list_rep <- function(x, n=NULL){
 modebind_list <- function(L, m=NULL){
     # Argument check
     .checkModeBindList(L, m)
-    # Setting
+    # Bind along dimension m using arbind with aperm
     num_modes <- .ndim(L[[1]])
-    l <- length(L)
-    m_modes <- unlist(lapply(L, function(x,m){dim(x)[m]}, m=m))
-    new_modes <- as.integer(dim(L[[1]]))
-    new_modes[m] <- sum(m_modes)
-    new_modes <- as.integer(new_modes)
-    # Vectorization
-    Lvec <- lapply(L, function(x){vec(x)})
-    cmd <- paste0("Lvec <- rbind(",
-        paste(paste0("Lvec[[", seq_len(l), "]]"), collapse=","),
-        ")")
-    eval(parse(text=cmd))
-    Lvec <- .realize_and_return(Lvec)
-    Lvec <- .reshapeIncNumbers1D(Lvec, new_modes)
-    .realize_and_return(Lvec)
+    if(m == 1){
+        out <- do.call(arbind, L)
+    }else{
+        # Move dimension m to first position, arbind, then restore
+        perm <- seq_len(num_modes)
+        perm[1] <- m
+        perm[m] <- 1
+        L_perm <- lapply(L, function(x) aperm(x, perm))
+        out <- do.call(arbind, L_perm)
+        out <- aperm(out, perm)
+    }
+    .realize_and_return(out)
 }
 
 # rbind_list
@@ -126,12 +124,11 @@ DelayedDiagonalArray <- function(shape, value){
     num_modes <- length(shape)
     min.s <- min(shape)
     if(missing(value)){
-        value <- rep(1L, num_modes)
+        value <- rep(1L, min.s)
     }
-    out <- COO_SparseArray(shape)
-    out@nzdata <- as.vector(value)
-    out@nzcoo <-  t(vapply(seq_len(min.s),
+    nzcoo <- t(vapply(seq_len(min.s),
         function(x){rep(x, num_modes)}, rep(1L, num_modes)))
+    out <- COO_SparseArray(shape, nzcoo=nzcoo, nzdata=as.vector(value))
     DelayedArray(out)
 }
 

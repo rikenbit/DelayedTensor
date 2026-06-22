@@ -1,543 +1,1058 @@
 # DelayedArray arrects
 
 context("### einsum (transpose) ###\n")
-expect_equal(t(arrD),
+expect_equal(
+    t(arrD),
+    einsum::einsum('ij->ji', arrD))
+expect_equal(
     einsum::einsum('ij->ji', arrD),
     as.array(einsum('ij->ji', darrD)))
 
-expect_equal(aperm(arrF, c(1,3,2)),
+expect_equal(
+    aperm(arrF, c(1,3,2)),
+    einsum::einsum('ijk->ikj', arrF))
+expect_equal(
     einsum::einsum('ijk->ikj', arrF),
     as.array(einsum('ijk->ikj', darrF)))
-expect_equal(aperm(arrF, c(2,1,3)),
+expect_equal(
+    aperm(arrF, c(2,1,3)),
+    einsum::einsum('ijk->jik', arrF))
+expect_equal(
     einsum::einsum('ijk->jik', arrF),
     as.array(einsum('ijk->jik', darrF)))
-expect_equal(aperm(arrF, c(2,3,1)),
+expect_equal(
+    aperm(arrF, c(2,3,1)),
+    einsum::einsum('ijk->jki', arrF))
+expect_equal(
     einsum::einsum('ijk->jki', arrF),
     as.array(einsum('ijk->jki', darrF)))
-expect_equal(aperm(arrF, c(3,1,2)),
+expect_equal(
+    aperm(arrF, c(3,1,2)),
+    einsum::einsum('ijk->kij', arrF))
+expect_equal(
     einsum::einsum('ijk->kij', arrF),
     as.array(einsum('ijk->kij', darrF)))
-expect_equal(aperm(arrF, c(3,2,1)),
+expect_equal(
+    aperm(arrF, c(3,2,1)),
+    einsum::einsum('ijk->kji', arrF))
+expect_equal(
     einsum::einsum('ijk->kji', arrF),
     as.array(einsum('ijk->kji', darrF)))
-expect_equal(aperm(arrG, c(1,2,4,3)),
+expect_equal(
+    aperm(arrG, c(1,2,4,3)),
+    einsum::einsum('ijkl->ijlk', arrG))
+expect_equal(
     einsum::einsum('ijkl->ijlk', arrG),
     as.array(einsum('ijkl->ijlk', darrG)))
-expect_equal(aperm(arrG, c(1,3,2,4)),
+expect_equal(
+    aperm(arrG, c(1,3,2,4)),
+    einsum::einsum('ijkl->ikjl', arrG))
+expect_equal(
     einsum::einsum('ijkl->ikjl', arrG),
     as.array(einsum('ijkl->ikjl', darrG)))
-expect_equal(aperm(arrG, c(1,3,4,2)),
+expect_equal(
+    aperm(arrG, c(1,3,4,2)),
+    einsum::einsum('ijkl->iklj', arrG))
+expect_equal(
     einsum::einsum('ijkl->iklj', arrG),
     as.array(einsum('ijkl->iklj', darrG)))
-expect_equal(aperm(arrG, c(1,4,2,3)),
+expect_equal(
+    aperm(arrG, c(1,4,2,3)),
+    einsum::einsum('ijkl->iljk', arrG))
+expect_equal(
     einsum::einsum('ijkl->iljk', arrG),
     as.array(einsum('ijkl->iljk', darrG)))
-expect_equal(aperm(arrG, c(1,4,3,2)),
+expect_equal(
+    aperm(arrG, c(1,4,3,2)),
+    einsum::einsum('ijkl->ilkj', arrG))
+expect_equal(
     einsum::einsum('ijkl->ilkj', arrG),
     as.array(einsum('ijkl->ilkj', darrG)))
-expect_equal(aperm(arrG, c(2,1,3,4)),
+expect_equal(
+    aperm(arrG, c(2,1,3,4)),
+    einsum::einsum('ijkl->jikl', arrG))
+expect_equal(
     einsum::einsum('ijkl->jikl', arrG),
     as.array(einsum('ijkl->jikl', darrG)))
-expect_equal(aperm(arrG, c(2,1,4,3)),
+expect_equal(
+    aperm(arrG, c(2,1,4,3)),
+    einsum::einsum('ijkl->jilk', arrG))
+expect_equal(
     einsum::einsum('ijkl->jilk', arrG),
     as.array(einsum('ijkl->jilk', darrG)))
-expect_equal(aperm(arrG, c(2,3,1,4)),
+expect_equal(
+    aperm(arrG, c(2,3,1,4)),
+    einsum::einsum('ijkl->jkil', arrG))
+expect_equal(
     einsum::einsum('ijkl->jkil', arrG),
     as.array(einsum('ijkl->jkil', darrG)))
-expect_equal(aperm(arrG, c(2,3,4,1)),
+expect_equal(
+    aperm(arrG, c(2,3,4,1)),
+    einsum::einsum('ijkl->jkli', arrG))
+expect_equal(
     einsum::einsum('ijkl->jkli', arrG),
     as.array(einsum('ijkl->jkli', darrG)))
-expect_equal(aperm(arrG, c(2,4,1,3)),
+expect_equal(
+    aperm(arrG, c(2,4,1,3)),
+    einsum::einsum('ijkl->jlik', arrG))
+expect_equal(
     einsum::einsum('ijkl->jlik', arrG),
     as.array(einsum('ijkl->jlik', darrG)))
-expect_equal(aperm(arrG, c(2,4,3,1)),
+expect_equal(
+    aperm(arrG, c(2,4,3,1)),
+    einsum::einsum('ijkl->jlki', arrG))
+expect_equal(
     einsum::einsum('ijkl->jlki', arrG),
     as.array(einsum('ijkl->jlki', darrG)))
-expect_equal(aperm(arrG, c(3,1,2,4)),
+expect_equal(
+    aperm(arrG, c(3,1,2,4)),
+    einsum::einsum('ijkl->kijl', arrG))
+expect_equal(
     einsum::einsum('ijkl->kijl', arrG),
     as.array(einsum('ijkl->kijl', darrG)))
-expect_equal(aperm(arrG, c(3,1,4,2)),
+expect_equal(
+    aperm(arrG, c(3,1,4,2)),
+    einsum::einsum('ijkl->kilj', arrG))
+expect_equal(
     einsum::einsum('ijkl->kilj', arrG),
     as.array(einsum('ijkl->kilj', darrG)))
-expect_equal(aperm(arrG, c(3,2,1,4)),
+expect_equal(
+    aperm(arrG, c(3,2,1,4)),
+    einsum::einsum('ijkl->kjil', arrG))
+expect_equal(
     einsum::einsum('ijkl->kjil', arrG),
     as.array(einsum('ijkl->kjil', darrG)))
-expect_equal(aperm(arrG, c(3,2,4,1)),
+expect_equal(
+    aperm(arrG, c(3,2,4,1)),
+    einsum::einsum('ijkl->kjli', arrG))
+expect_equal(
     einsum::einsum('ijkl->kjli', arrG),
     as.array(einsum('ijkl->kjli', darrG)))
-expect_equal(aperm(arrG, c(3,4,1,2)),
+expect_equal(
+    aperm(arrG, c(3,4,1,2)),
+    einsum::einsum('ijkl->klij', arrG))
+expect_equal(
     einsum::einsum('ijkl->klij', arrG),
     as.array(einsum('ijkl->klij', darrG)))
-expect_equal(aperm(arrG, c(3,4,2,1)),
+expect_equal(
+    aperm(arrG, c(3,4,2,1)),
+    einsum::einsum('ijkl->klji', arrG))
+expect_equal(
     einsum::einsum('ijkl->klji', arrG),
     as.array(einsum('ijkl->klji', darrG)))
-expect_equal(aperm(arrG, c(4,1,2,3)),
+expect_equal(
+    aperm(arrG, c(4,1,2,3)),
+    einsum::einsum('ijkl->lijk', arrG))
+expect_equal(
     einsum::einsum('ijkl->lijk', arrG),
     as.array(einsum('ijkl->lijk', darrG)))
-expect_equal(aperm(arrG, c(4,1,3,2)),
+expect_equal(
+    aperm(arrG, c(4,1,3,2)),
+    einsum::einsum('ijkl->likj', arrG))
+expect_equal(
     einsum::einsum('ijkl->likj', arrG),
     as.array(einsum('ijkl->likj', darrG)))
-expect_equal(aperm(arrG, c(4,2,1,3)),
+expect_equal(
+    aperm(arrG, c(4,2,1,3)),
+    einsum::einsum('ijkl->ljik', arrG))
+expect_equal(
     einsum::einsum('ijkl->ljik', arrG),
     as.array(einsum('ijkl->ljik', darrG)))
-expect_equal(aperm(arrG, c(4,2,3,1)),
+expect_equal(
+    aperm(arrG, c(4,2,3,1)),
+    einsum::einsum('ijkl->ljki', arrG))
+expect_equal(
     einsum::einsum('ijkl->ljki', arrG),
     as.array(einsum('ijkl->ljki', darrG)))
-expect_equal(aperm(arrG, c(4,3,1,2)),
+expect_equal(
+    aperm(arrG, c(4,3,1,2)),
+    einsum::einsum('ijkl->lkij', arrG))
+expect_equal(
     einsum::einsum('ijkl->lkij', arrG),
     as.array(einsum('ijkl->lkij', darrG)))
-expect_equal(aperm(arrG, c(4,3,2,1)),
+expect_equal(
+    aperm(arrG, c(4,3,2,1)),
+    einsum::einsum('ijkl->lkji', arrG))
+expect_equal(
     einsum::einsum('ijkl->lkji', arrG),
     as.array(einsum('ijkl->lkji', darrG)))
 
 context("### einsum (sum + permutation) ###\n")
-expect_equal(sum(arrA),
+expect_equal(
+    sum(arrA),
+    as.vector(einsum::einsum('i->', arrA)))
+expect_equal(
     as.vector(einsum::einsum('i->', arrA)),
     as.vector(einsum('i->', darrA)))
-expect_equal(sum(arrD),
+expect_equal(
+    sum(arrD),
+    as.vector(einsum::einsum('ij->', arrD)))
+expect_equal(
     as.vector(einsum::einsum('ij->', arrD)),
     as.vector(einsum('ij->', darrD)))
 
-expect_equal(rowSums(arrD),
+expect_equal(
+    rowSums(arrD),
+    as.vector(einsum::einsum('ij->i', arrD)))
+expect_equal(
     as.vector(einsum::einsum('ij->i', arrD)),
     as.vector(einsum('ij->i', darrD)))
-expect_equal(colSums(arrD),
+expect_equal(
+    colSums(arrD),
+    as.vector(einsum::einsum('ij->j', arrD)))
+expect_equal(
     as.vector(einsum::einsum('ij->j', arrD)),
     as.vector(einsum('ij->j', darrD)))
 
-expect_equal(sum(arrF),
+expect_equal(
+    sum(arrF),
+    as.vector(einsum::einsum('ijk->', arrF)))
+expect_equal(
     as.vector(einsum::einsum('ijk->', arrF)),
     as.vector(einsum('ijk->', darrF)))
-expect_equal(tmp1,
+expect_equal(
+    tmp1,
+    as.vector(einsum::einsum('ijk->i', arrF)))
+expect_equal(
     as.vector(einsum::einsum('ijk->i', arrF)),
     as.vector(einsum('ijk->i', darrF)))
-expect_equal(tmp2,
+expect_equal(
+    tmp2,
+    as.vector(einsum::einsum('ijk->j', arrF)))
+expect_equal(
     as.vector(einsum::einsum('ijk->j', arrF)),
     as.vector(einsum('ijk->j', darrF)))
-expect_equal(tmp3,
+expect_equal(
+    tmp3,
+    as.vector(einsum::einsum('ijk->k', arrF)))
+expect_equal(
     as.vector(einsum::einsum('ijk->k', arrF)),
     as.vector(einsum('ijk->k', darrF)))
-expect_equal(tmp4,
+expect_equal(
+    tmp4,
+    as.array(einsum::einsum('ijk->ij', arrF)))
+expect_equal(
     as.array(einsum::einsum('ijk->ij', arrF)),
     as.array(einsum('ijk->ij', darrF)))
-expect_equal(tmp5,
+expect_equal(
+    tmp5,
+    as.array(einsum::einsum('ijk->jk', arrF)))
+expect_equal(
     as.array(einsum::einsum('ijk->jk', arrF)),
     as.array(einsum('ijk->jk', darrF)))
-expect_equal(tmp6,
+expect_equal(
+    tmp6,
+    as.array(einsum::einsum('ijk->ik', arrF)))
+expect_equal(
     as.array(einsum::einsum('ijk->ik', arrF)),
     as.array(einsum('ijk->ik', darrF)))
-expect_equal(sum(arrG),
+expect_equal(
+    sum(arrG),
+    as.vector(einsum::einsum('ijkl->', arrG)))
+expect_equal(
     as.vector(einsum::einsum('ijkl->', arrG)),
     as.vector(einsum('ijkl->', darrG)))
-expect_equal(tmp7,
+expect_equal(
+    tmp7,
+    as.vector(einsum::einsum('ijkl->i', arrG)))
+expect_equal(
     as.vector(einsum::einsum('ijkl->i', arrG)),
     as.vector(einsum('ijkl->i', darrG)))
-expect_equal(tmp8,
+expect_equal(
+    tmp8,
+    as.vector(einsum::einsum('ijkl->j', arrG)))
+expect_equal(
     as.vector(einsum::einsum('ijkl->j', arrG)),
     as.vector(einsum('ijkl->j', darrG)))
-expect_equal(tmp9,
+expect_equal(
+    tmp9,
+    as.vector(einsum::einsum('ijkl->k', arrG)))
+expect_equal(
     as.vector(einsum::einsum('ijkl->k', arrG)),
     as.vector(einsum('ijkl->k', darrG)))
-expect_equal(tmp10,
+expect_equal(
+    tmp10,
+    as.vector(einsum::einsum('ijkl->l', arrG)))
+expect_equal(
     as.vector(einsum::einsum('ijkl->l', arrG)),
     as.vector(einsum('ijkl->l', darrG)))
-expect_equal(tmp11,
+expect_equal(
+    tmp11,
+    as.array(einsum::einsum('ijkl->ij', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->ij', arrG)),
     as.array(einsum('ijkl->ij', darrG)))
-expect_equal(tmp12,
+expect_equal(
+    tmp12,
+    as.array(einsum::einsum('ijkl->ik', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->ik', arrG)),
     as.array(einsum('ijkl->ik', darrG)))
-expect_equal(tmp13,
+expect_equal(
+    tmp13,
+    as.array(einsum::einsum('ijkl->il', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->il', arrG)),
     as.array(einsum('ijkl->il', darrG)))
-expect_equal(tmp14,
+expect_equal(
+    tmp14,
+    as.array(einsum::einsum('ijkl->ji', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->ji', arrG)),
     as.array(einsum('ijkl->ji', darrG)))
-expect_equal(tmp15,
+expect_equal(
+    tmp15,
+    as.array(einsum::einsum('ijkl->jk', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->jk', arrG)),
     as.array(einsum('ijkl->jk', darrG)))
-expect_equal(tmp16,
+expect_equal(
+    tmp16,
+    as.array(einsum::einsum('ijkl->jl', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->jl', arrG)),
     as.array(einsum('ijkl->jl', darrG)))
-expect_equal(tmp17,
+expect_equal(
+    tmp17,
+    as.array(einsum::einsum('ijkl->ki', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->ki', arrG)),
     as.array(einsum('ijkl->ki', darrG)))
-expect_equal(tmp18,
+expect_equal(
+    tmp18,
+    as.array(einsum::einsum('ijkl->kj', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->kj', arrG)),
     as.array(einsum('ijkl->kj', darrG)))
-expect_equal(tmp19,
+expect_equal(
+    tmp19,
+    as.array(einsum::einsum('ijkl->kl', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->kl', arrG)),
     as.array(einsum('ijkl->kl', darrG)))
-expect_equal(tmp20,
+expect_equal(
+    tmp20,
+    as.array(einsum::einsum('ijkl->li', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->li', arrG)),
     as.array(einsum('ijkl->li', darrG)))
-expect_equal(tmp21,
+expect_equal(
+    tmp21,
+    as.array(einsum::einsum('ijkl->lj', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->lj', arrG)),
     as.array(einsum('ijkl->lj', darrG)))
-expect_equal(tmp22,
+expect_equal(
+    tmp22,
+    as.array(einsum::einsum('ijkl->lk', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->lk', arrG)),
     as.array(einsum('ijkl->lk', darrG)))
-expect_equal(tmp23,
+expect_equal(
+    tmp23,
+    as.array(einsum::einsum('ijkl->ijk', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->ijk', arrG)),
     as.array(einsum('ijkl->ijk', darrG)))
-expect_equal(tmp24,
+expect_equal(
+    tmp24,
+    as.array(einsum::einsum('ijkl->ijl', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->ijl', arrG)),
     as.array(einsum('ijkl->ijl', darrG)))
-expect_equal(tmp25,
+expect_equal(
+    tmp25,
+    as.array(einsum::einsum('ijkl->ikj', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->ikj', arrG)),
     as.array(einsum('ijkl->ikj', darrG)))
-expect_equal(tmp26,
+expect_equal(
+    tmp26,
+    as.array(einsum::einsum('ijkl->ikl', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->ikl', arrG)),
     as.array(einsum('ijkl->ikl', darrG)))
-expect_equal(tmp27,
+expect_equal(
+    tmp27,
+    as.array(einsum::einsum('ijkl->ilj', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->ilj', arrG)),
     as.array(einsum('ijkl->ilj', darrG)))
-expect_equal(tmp28,
+expect_equal(
+    tmp28,
+    as.array(einsum::einsum('ijkl->ilk', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->ilk', arrG)),
     as.array(einsum('ijkl->ilk', darrG)))
-expect_equal(tmp29,
+expect_equal(
+    tmp29,
+    as.array(einsum::einsum('ijkl->jik', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->jik', arrG)),
     as.array(einsum('ijkl->jik', darrG)))
-expect_equal(tmp30,
+expect_equal(
+    tmp30,
+    as.array(einsum::einsum('ijkl->jil', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->jil', arrG)),
     as.array(einsum('ijkl->jil', darrG)))
-expect_equal(tmp31,
+expect_equal(
+    tmp31,
+    as.array(einsum::einsum('ijkl->jki', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->jki', arrG)),
     as.array(einsum('ijkl->jki', darrG)))
-expect_equal(tmp32,
+expect_equal(
+    tmp32,
+    as.array(einsum::einsum('ijkl->jkl', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->jkl', arrG)),
     as.array(einsum('ijkl->jkl', darrG)))
-expect_equal(tmp33,
+expect_equal(
+    tmp33,
+    as.array(einsum::einsum('ijkl->jli', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->jli', arrG)),
     as.array(einsum('ijkl->jli', darrG)))
-expect_equal(tmp34,
+expect_equal(
+    tmp34,
+    as.array(einsum::einsum('ijkl->jlk', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->jlk', arrG)),
     as.array(einsum('ijkl->jlk', darrG)))
-expect_equal(tmp35,
+expect_equal(
+    tmp35,
+    as.array(einsum::einsum('ijkl->kij', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->kij', arrG)),
     as.array(einsum('ijkl->kij', darrG)))
-expect_equal(tmp36,
+expect_equal(
+    tmp36,
+    as.array(einsum::einsum('ijkl->kil', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->kil', arrG)),
     as.array(einsum('ijkl->kil', darrG)))
-expect_equal(tmp37,
+expect_equal(
+    tmp37,
+    as.array(einsum::einsum('ijkl->kji', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->kji', arrG)),
     as.array(einsum('ijkl->kji', darrG)))
-expect_equal(tmp38,
+expect_equal(
+    tmp38,
+    as.array(einsum::einsum('ijkl->kjl', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->kjl', arrG)),
     as.array(einsum('ijkl->kjl', darrG)))
-expect_equal(tmp39,
+expect_equal(
+    tmp39,
+    as.array(einsum::einsum('ijkl->kli', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->kli', arrG)),
     as.array(einsum('ijkl->kli', darrG)))
-expect_equal(tmp40,
+expect_equal(
+    tmp40,
+    as.array(einsum::einsum('ijkl->klj', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->klj', arrG)),
     as.array(einsum('ijkl->klj', darrG)))
-expect_equal(tmp41,
+expect_equal(
+    tmp41,
+    as.array(einsum::einsum('ijkl->lij', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->lij', arrG)),
     as.array(einsum('ijkl->lij', darrG)))
-expect_equal(tmp42,
+expect_equal(
+    tmp42,
+    as.array(einsum::einsum('ijkl->lik', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->lik', arrG)),
     as.array(einsum('ijkl->lik', darrG)))
-expect_equal(tmp43,
+expect_equal(
+    tmp43,
+    as.array(einsum::einsum('ijkl->lji', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->lji', arrG)),
     as.array(einsum('ijkl->lji', darrG)))
-expect_equal(tmp44,
+expect_equal(
+    tmp44,
+    as.array(einsum::einsum('ijkl->ljk', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->ljk', arrG)),
     as.array(einsum('ijkl->ljk', darrG)))
-expect_equal(tmp45,
+expect_equal(
+    tmp45,
+    as.array(einsum::einsum('ijkl->lki', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->lki', arrG)),
     as.array(einsum('ijkl->lki', darrG)))
-expect_equal(tmp46,
+expect_equal(
+    tmp46,
+    as.array(einsum::einsum('ijkl->lkj', arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl->lkj', arrG)),
     as.array(einsum('ijkl->lkj', darrG)))
 
 context("### einsum (multiply, diagonal) ###\n")
-expect_equal(base::diag(arrC),
+expect_equal(
+    base::diag(arrC),
+    as.vector(einsum::einsum('ii->i', arrC)))
+expect_equal(
     as.vector(einsum::einsum('ii->i', arrC)),
     as.vector(einsum('ii->i', darrC)))
-expect_equal(tmp47,
+expect_equal(
+    tmp47,
+    as.vector(einsum::einsum('iii->i', arrE)))
+expect_equal(
     as.vector(einsum::einsum('iii->i', arrE)),
     as.vector(einsum('iii->i', darrE)))
-expect_equal(tmp48,
+expect_equal(
+    tmp48,
+    as.vector(einsum::einsum('iiii->i', arrG)))
+expect_equal(
     as.vector(einsum::einsum('iiii->i', arrG)),
     as.vector(einsum('iiii->i', darrG)))
 
 context("### einsum (sum + multiply + transpose) ###\n")
 # Hadamard matrix
-expect_equal(arrA*arrA,
+expect_equal(
+    arrA*arrA,
+    as.array(einsum::einsum('i,i->i', arrA, arrA)))
+expect_equal(
     as.array(einsum::einsum('i,i->i', arrA, arrA)),
     as.array(einsum('i,i->i', darrA, darrA)))
-expect_equal(arrD*arrD,
+expect_equal(
+    arrD*arrD,
+    as.array(einsum::einsum('ij,ij->ij', arrD, arrD)))
+expect_equal(
     as.array(einsum::einsum('ij,ij->ij', arrD, arrD)),
     as.array(einsum('ij,ij->ij', darrD, darrD)))
-expect_equal(arrF*arrF,
+expect_equal(
+    arrF*arrF,
+    as.array(einsum::einsum('ijk,ijk->ijk', arrF, arrF)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijk->ijk', arrF, arrF)),
     as.array(einsum('ijk,ijk->ijk', darrF, darrF)))
-expect_equal(arrG*arrG,
+expect_equal(
+    arrG*arrG,
+    as.array(einsum::einsum('ijkl,ijkl->ijkl', arrG, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijkl,ijkl->ijkl', arrG, arrG)),
     as.array(einsum('ijkl,ijkl->ijkl', darrG, darrG)))
 
 # Frobenius norm^2
-expect_equal(sum(arrA*arrA),
+expect_equal(
+    sum(arrA*arrA),
+    as.vector(einsum::einsum('i,i->', arrA, arrA)))
+expect_equal(
     as.vector(einsum::einsum('i,i->', arrA, arrA)),
     as.vector(einsum('i,i->', darrA, darrA)))
-expect_equal(sum(arrD*arrD),
+expect_equal(
+    sum(arrD*arrD),
+    as.vector(einsum::einsum('ij,ij->', arrD, arrD)))
+expect_equal(
     as.vector(einsum::einsum('ij,ij->', arrD, arrD)),
     as.vector(einsum('ij,ij->', darrD, darrD)))
-expect_equal(sum(arrF*arrF),
+expect_equal(
+    sum(arrF*arrF),
+    as.vector(einsum::einsum('ijk,ijk->', arrF, arrF)))
+expect_equal(
     as.vector(einsum::einsum('ijk,ijk->', arrF, arrF)),
     as.vector(einsum('ijk,ijk->', darrF, darrF)))
-expect_equal(sum(arrG*arrG),
+expect_equal(
+    sum(arrG*arrG),
+    as.vector(einsum::einsum('ijkl,ijkl->', arrG, arrG)))
+expect_equal(
     as.vector(einsum::einsum('ijkl,ijkl->', arrG, arrG)),
     as.vector(einsum('ijkl,ijkl->', darrG, darrG)))
 
-expect_equal(sum(arrC%*%arrD),
+expect_equal(
+    sum(arrC%*%arrD),
+    as.vector(einsum::einsum('ij,jk->', arrC, arrD)))
+expect_equal(
     as.vector(einsum::einsum('ij,jk->', arrC, arrD)),
     as.vector(einsum('ij,jk->', darrC, darrD)))
 
-expect_equal(rowSums(arrC%*%arrD),
+expect_equal(
+    rowSums(arrC%*%arrD),
+    as.vector(einsum::einsum('ij,jk->i', arrC, arrD)))
+expect_equal(
     as.vector(einsum::einsum('ij,jk->i', arrC, arrD)),
     as.vector(einsum('ij,jk->i', darrC, darrD)))
-expect_equal(tmp49,
+expect_equal(
+    tmp49,
+    as.vector(einsum::einsum('ij,jk->j', arrC, arrD)))
+expect_equal(
     as.vector(einsum::einsum('ij,jk->j', arrC, arrD)),
     as.vector(einsum('ij,jk->j', darrC, darrD)))
-expect_equal(colSums(arrC%*%arrD),
+expect_equal(
+    colSums(arrC%*%arrD),
+    as.vector(einsum::einsum('ij,jk->k', arrC, arrD)))
+expect_equal(
     as.vector(einsum::einsum('ij,jk->k', arrC, arrD)),
     as.vector(einsum('ij,jk->k', darrC, darrD)))
 
-expect_equal(tmp50,
+expect_equal(
+    tmp50,
+    as.array(einsum::einsum('ij,jk->ij', arrC, arrD)))
+expect_equal(
     as.array(einsum::einsum('ij,jk->ij', arrC, arrD)),
     as.array(einsum('ij,jk->ij', darrC, darrD)))
-expect_equal(tmp51,
+expect_equal(
+    tmp51,
+    as.array(einsum::einsum('ij,jk->ji', arrC, arrD)))
+expect_equal(
     as.array(einsum::einsum('ij,jk->ji', arrC, arrD)),
     as.array(einsum('ij,jk->ji', darrC, darrD)))
-expect_equal(tmp52,
+expect_equal(
+    tmp52,
+    as.array(einsum::einsum('ij,jk->jk', arrC, arrD)))
+expect_equal(
     as.array(einsum::einsum('ij,jk->jk', arrC, arrD)),
     as.array(einsum('ij,jk->jk', darrC, darrD)))
-expect_equal(tmp53,
+expect_equal(
+    tmp53,
+    as.array(einsum::einsum('ij,jk->kj', arrC, arrD)))
+expect_equal(
     as.array(einsum::einsum('ij,jk->kj', arrC, arrD)),
     as.array(einsum('ij,jk->kj', darrC, darrD)))
-expect_equal(tmp54,
+expect_equal(
+    tmp54,
+    as.array(einsum::einsum('ij,jk->ik', arrC, arrD)))
+expect_equal(
     as.array(einsum::einsum('ij,jk->ik', arrC, arrD)),
     as.array(einsum('ij,jk->ik', darrC, darrD)))
-expect_equal(tmp55,
+expect_equal(
+    tmp55,
+    as.array(einsum::einsum('ij,jk->ki', arrC, arrD)))
+expect_equal(
     as.array(einsum::einsum('ij,jk->ki', arrC, arrD)),
     as.array(einsum('ij,jk->ki', darrC, darrD)))
 
-expect_equal(tmp56,
+expect_equal(
+    tmp56,
+    as.array(einsum::einsum('ij,jk->ijk', arrC, arrD)))
+expect_equal(
     as.array(einsum::einsum('ij,jk->ijk', arrC, arrD)),
     as.array(einsum('ij,jk->ijk', darrC, darrD)))
-expect_equal(tmp57,
+expect_equal(
+    tmp57,
+    as.array(einsum::einsum('ij,jk->ikj', arrC, arrD)))
+expect_equal(
     as.array(einsum::einsum('ij,jk->ikj', arrC, arrD)),
     as.array(einsum('ij,jk->ikj', darrC, darrD)))
-expect_equal(tmp58,
+expect_equal(
+    tmp58,
+    as.array(einsum::einsum('ij,jk->jik', arrC, arrD)))
+expect_equal(
     as.array(einsum::einsum('ij,jk->jik', arrC, arrD)),
     as.array(einsum('ij,jk->jik', darrC, darrD)))
-expect_equal(tmp59,
+expect_equal(
+    tmp59,
+    as.array(einsum::einsum('ij,jk->jki', arrC, arrD)))
+expect_equal(
     as.array(einsum::einsum('ij,jk->jki', arrC, arrD)),
     as.array(einsum('ij,jk->jki', darrC, darrD)))
-expect_equal(tmp60,
+expect_equal(
+    tmp60,
+    as.array(einsum::einsum('ij,jk->kij', arrC, arrD)))
+expect_equal(
     as.array(einsum::einsum('ij,jk->kij', arrC, arrD)),
     as.array(einsum('ij,jk->kij', darrC, darrD)))
-expect_equal(tmp61,
+expect_equal(
+    tmp61,
+    as.array(einsum::einsum('ij,jk->kji', arrC, arrD)))
+expect_equal(
     as.array(einsum::einsum('ij,jk->kji', arrC, arrD)),
     as.array(einsum('ij,jk->kji', darrC, darrD)))
 
-expect_equal(tmp62,
+expect_equal(
+    tmp62,
+    as.vector(einsum::einsum('ij,ijk->', arrC, arrE)))
+expect_equal(
     as.vector(einsum::einsum('ij,ijk->', arrC, arrE)),
     as.vector(einsum('ij,ijk->', darrC, darrE)))
-expect_equal(tmp63,
+expect_equal(
+    tmp63,
+    as.vector(einsum::einsum('ij,ijk->i', arrC, arrE)))
+expect_equal(
     as.vector(einsum::einsum('ij,ijk->i', arrC, arrE)),
     as.vector(einsum('ij,ijk->i', darrC, darrE)))
-expect_equal(tmp64,
+expect_equal(
+    tmp64,
+    as.vector(einsum::einsum('ij,ijk->j', arrC, arrE)))
+expect_equal(
     as.vector(einsum::einsum('ij,ijk->j', arrC, arrE)),
     as.vector(einsum('ij,ijk->j', darrC, darrE)))
-expect_equal(tmp65,
+expect_equal(
+    tmp65,
+    as.vector(einsum::einsum('ij,ijk->k', arrC, arrE)))
+expect_equal(
     as.vector(einsum::einsum('ij,ijk->k', arrC, arrE)),
     as.vector(einsum('ij,ijk->k', darrC, darrE)))
-expect_equal(tmp66,
+expect_equal(
+    tmp66,
+    as.array(einsum::einsum('ij,ijk->ij', arrC, arrE)))
+expect_equal(
     as.array(einsum::einsum('ij,ijk->ij', arrC, arrE)),
     as.array(einsum('ij,ijk->ij', darrC, darrE)))
-expect_equal(tmp67,
+expect_equal(
+    tmp67,
+    as.array(einsum::einsum('ij,ijk->ji', arrC, arrE)))
+expect_equal(
     as.array(einsum::einsum('ij,ijk->ji', arrC, arrE)),
     as.array(einsum('ij,ijk->ji', darrC, darrE)))
-expect_equal(tmp68,
+expect_equal(
+    tmp68,
+    as.array(einsum::einsum('ij,ijk->jk', arrC, arrE)))
+expect_equal(
     as.array(einsum::einsum('ij,ijk->jk', arrC, arrE)),
     as.array(einsum('ij,ijk->jk', darrC, darrE)))
-expect_equal(tmp69,
+expect_equal(
+    tmp69,
+    as.array(einsum::einsum('ij,ijk->kj', arrC, arrE)))
+expect_equal(
     as.array(einsum::einsum('ij,ijk->kj', arrC, arrE)),
     as.array(einsum('ij,ijk->kj', darrC, darrE)))
-expect_equal(tmp70,
+expect_equal(
+    tmp70,
+    as.array(einsum::einsum('ij,ijk->ik', arrC, arrE)))
+expect_equal(
     as.array(einsum::einsum('ij,ijk->ik', arrC, arrE)),
     as.array(einsum('ij,ijk->ik', darrC, darrE)))
-expect_equal(tmp71,
+expect_equal(
+    tmp71,
+    as.array(einsum::einsum('ij,ijk->ki', arrC, arrE)))
+expect_equal(
     as.array(einsum::einsum('ij,ijk->ki', arrC, arrE)),
     as.array(einsum('ij,ijk->ki', darrC, darrE)))
-expect_equal(tmp72,
+expect_equal(
+    tmp72,
+    as.array(einsum::einsum('ij,ijk->ijk', arrC, arrE)))
+expect_equal(
     as.array(einsum::einsum('ij,ijk->ijk', arrC, arrE)),
     as.array(einsum('ij,ijk->ijk', darrC, darrE)))
 
-expect_equal(tmp73,
+expect_equal(
+    tmp73,
+    as.vector(einsum::einsum('ijk,ijkl->', arrE, arrG)))
+expect_equal(
     as.vector(einsum::einsum('ijk,ijkl->', arrE, arrG)),
     as.vector(einsum('ijk,ijkl->', darrE, darrG)))
-expect_equal(tmp74,
+expect_equal(
+    tmp74,
+    as.vector(einsum::einsum('ijk,ijkl->i', arrE, arrG)))
+expect_equal(
     as.vector(einsum::einsum('ijk,ijkl->i', arrE, arrG)),
     as.vector(einsum('ijk,ijkl->i', darrE, darrG)))
-expect_equal(tmp75,
+expect_equal(
+    tmp75,
+    as.vector(einsum::einsum('ijk,ijkl->j', arrE, arrG)))
+expect_equal(
     as.vector(einsum::einsum('ijk,ijkl->j', arrE, arrG)),
     as.vector(einsum('ijk,ijkl->j', darrE, darrG)))
-expect_equal(tmp76,
+expect_equal(
+    tmp76,
+    as.vector(einsum::einsum('ijk,ijkl->k', arrE, arrG)))
+expect_equal(
     as.vector(einsum::einsum('ijk,ijkl->k', arrE, arrG)),
     as.vector(einsum('ijk,ijkl->k', darrE, darrG)))
-expect_equal(tmp77,
+expect_equal(
+    tmp77,
+    as.vector(einsum::einsum('ijk,ijkl->l', arrE, arrG)))
+expect_equal(
     as.vector(einsum::einsum('ijk,ijkl->l', arrE, arrG)),
     as.vector(einsum('ijk,ijkl->l', darrE, darrG)))
-expect_equal(tmp78,
+expect_equal(
+    tmp78,
+    as.array(einsum::einsum('ijk,ijkl->ij', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->ij', arrE, arrG)),
     as.array(einsum('ijk,ijkl->ij', darrE, darrG)))
-expect_equal(tmp79,
+expect_equal(
+    tmp79,
+    as.array(einsum::einsum('ijk,ijkl->ji', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->ji', arrE, arrG)),
     as.array(einsum('ijk,ijkl->ji', darrE, darrG)))
-expect_equal(tmp80,
+expect_equal(
+    tmp80,
+    as.array(einsum::einsum('ijk,ijkl->ik', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->ik', arrE, arrG)),
     as.array(einsum('ijk,ijkl->ik', darrE, darrG)))
-expect_equal(tmp81,
+expect_equal(
+    tmp81,
+    as.array(einsum::einsum('ijk,ijkl->ki', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->ki', arrE, arrG)),
     as.array(einsum('ijk,ijkl->ki', darrE, darrG)))
-expect_equal(tmp82,
+expect_equal(
+    tmp82,
+    as.array(einsum::einsum('ijk,ijkl->il', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->il', arrE, arrG)),
     as.array(einsum('ijk,ijkl->il', darrE, darrG)))
-expect_equal(tmp83,
+expect_equal(
+    tmp83,
+    as.array(einsum::einsum('ijk,ijkl->li', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->li', arrE, arrG)),
     as.array(einsum('ijk,ijkl->li', darrE, darrG)))
-expect_equal(tmp84,
+expect_equal(
+    tmp84,
+    as.array(einsum::einsum('ijk,ijkl->jk', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->jk', arrE, arrG)),
     as.array(einsum('ijk,ijkl->jk', darrE, darrG)))
-expect_equal(tmp85,
+expect_equal(
+    tmp85,
+    as.array(einsum::einsum('ijk,ijkl->kj', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->kj', arrE, arrG)),
     as.array(einsum('ijk,ijkl->kj', darrE, darrG)))
-expect_equal(tmp86,
+expect_equal(
+    tmp86,
+    as.array(einsum::einsum('ijk,ijkl->jl', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->jl', arrE, arrG)),
     as.array(einsum('ijk,ijkl->jl', darrE, darrG)))
-expect_equal(tmp87,
+expect_equal(
+    tmp87,
+    as.array(einsum::einsum('ijk,ijkl->lj', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->lj', arrE, arrG)),
     as.array(einsum('ijk,ijkl->lj', darrE, darrG)))
-expect_equal(tmp88,
+expect_equal(
+    tmp88,
+    as.array(einsum::einsum('ijk,ijkl->kl', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->kl', arrE, arrG)),
     as.array(einsum('ijk,ijkl->kl', darrE, darrG)))
-expect_equal(tmp89,
+expect_equal(
+    tmp89,
+    as.array(einsum::einsum('ijk,ijkl->lk', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->lk', arrE, arrG)),
     as.array(einsum('ijk,ijkl->lk', darrE, darrG)))
 
-expect_equal(tmp90,
+expect_equal(
+    tmp90,
+    as.array(einsum::einsum('ijk,ijkl->ijk', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->ijk', arrE, arrG)),
     as.array(einsum('ijk,ijkl->ijk', darrE, darrG)))
-expect_equal(tmp91,
+expect_equal(
+    tmp91,
+    as.array(einsum::einsum('ijk,ijkl->ikj', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->ikj', arrE, arrG)),
     as.array(einsum('ijk,ijkl->ikj', darrE, darrG)))
-expect_equal(tmp92,
+expect_equal(
+    tmp92,
+    as.array(einsum::einsum('ijk,ijkl->jik', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->jik', arrE, arrG)),
     as.array(einsum('ijk,ijkl->jik', darrE, darrG)))
-expect_equal(tmp93,
+expect_equal(
+    tmp93,
+    as.array(einsum::einsum('ijk,ijkl->jki', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->jki', arrE, arrG)),
     as.array(einsum('ijk,ijkl->jki', darrE, darrG)))
-expect_equal(tmp94,
+expect_equal(
+    tmp94,
+    as.array(einsum::einsum('ijk,ijkl->kij', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->kij', arrE, arrG)),
     as.array(einsum('ijk,ijkl->kij', darrE, darrG)))
-expect_equal(tmp95,
+expect_equal(
+    tmp95,
+    as.array(einsum::einsum('ijk,ijkl->kji', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->kji', arrE, arrG)),
     as.array(einsum('ijk,ijkl->kji', darrE, darrG)))
-expect_equal(tmp96,
+expect_equal(
+    tmp96,
+    as.array(einsum::einsum('ijk,ijkl->ijl', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->ijl', arrE, arrG)),
     as.array(einsum('ijk,ijkl->ijl', darrE, darrG)))
-expect_equal(tmp97,
+expect_equal(
+    tmp97,
+    as.array(einsum::einsum('ijk,ijkl->ilj', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->ilj', arrE, arrG)),
     as.array(einsum('ijk,ijkl->ilj', darrE, darrG)))
-expect_equal(tmp98,
+expect_equal(
+    tmp98,
+    as.array(einsum::einsum('ijk,ijkl->jil', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->jil', arrE, arrG)),
     as.array(einsum('ijk,ijkl->jil', darrE, darrG)))
-expect_equal(tmp99,
+expect_equal(
+    tmp99,
+    as.array(einsum::einsum('ijk,ijkl->jli', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->jli', arrE, arrG)),
     as.array(einsum('ijk,ijkl->jli', darrE, darrG)))
-expect_equal(tmp100,
+expect_equal(
+    tmp100,
+    as.array(einsum::einsum('ijk,ijkl->lij', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->lij', arrE, arrG)),
     as.array(einsum('ijk,ijkl->lij', darrE, darrG)))
-expect_equal(tmp101,
+expect_equal(
+    tmp101,
+    as.array(einsum::einsum('ijk,ijkl->lji', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->lji', arrE, arrG)),
     as.array(einsum('ijk,ijkl->lji', darrE, darrG)))
-expect_equal(tmp102,
+expect_equal(
+    tmp102,
+    as.array(einsum::einsum('ijk,ijkl->ikl', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->ikl', arrE, arrG)),
     as.array(einsum('ijk,ijkl->ikl', darrE, darrG)))
-expect_equal(tmp103,
+expect_equal(
+    tmp103,
+    as.array(einsum::einsum('ijk,ijkl->ilk', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->ilk', arrE, arrG)),
     as.array(einsum('ijk,ijkl->ilk', darrE, darrG)))
-expect_equal(tmp104,
+expect_equal(
+    tmp104,
+    as.array(einsum::einsum('ijk,ijkl->kil', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->kil', arrE, arrG)),
     as.array(einsum('ijk,ijkl->kil', darrE, darrG)))
-expect_equal(tmp105,
+expect_equal(
+    tmp105,
+    as.array(einsum::einsum('ijk,ijkl->kli', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->kli', arrE, arrG)),
     as.array(einsum('ijk,ijkl->kli', darrE, darrG)))
-expect_equal(tmp106,
+expect_equal(
+    tmp106,
+    as.array(einsum::einsum('ijk,ijkl->lik', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->lik', arrE, arrG)),
     as.array(einsum('ijk,ijkl->lik', darrE, darrG)))
-expect_equal(tmp107,
+expect_equal(
+    tmp107,
+    as.array(einsum::einsum('ijk,ijkl->lki', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->lki', arrE, arrG)),
     as.array(einsum('ijk,ijkl->lki', darrE, darrG)))
-expect_equal(tmp108,
+expect_equal(
+    tmp108,
+    as.array(einsum::einsum('ijk,ijkl->jkl', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->jkl', arrE, arrG)),
     as.array(einsum('ijk,ijkl->jkl', darrE, darrG)))
-expect_equal(tmp109,
+expect_equal(
+    tmp109,
+    as.array(einsum::einsum('ijk,ijkl->jlk', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->jlk', arrE, arrG)),
     as.array(einsum('ijk,ijkl->jlk', darrE, darrG)))
-expect_equal(tmp110,
+expect_equal(
+    tmp110,
+    as.array(einsum::einsum('ijk,ijkl->kjl', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->kjl', arrE, arrG)),
     as.array(einsum('ijk,ijkl->kjl', darrE, darrG)))
-expect_equal(tmp111,
+expect_equal(
+    tmp111,
+    as.array(einsum::einsum('ijk,ijkl->klj', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->klj', arrE, arrG)),
     as.array(einsum('ijk,ijkl->klj', darrE, darrG)))
-expect_equal(tmp112,
+expect_equal(
+    tmp112,
+    as.array(einsum::einsum('ijk,ijkl->ljk', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->ljk', arrE, arrG)),
     as.array(einsum('ijk,ijkl->ljk', darrE, darrG)))
-expect_equal(tmp113,
+expect_equal(
+    tmp113,
+    as.array(einsum::einsum('ijk,ijkl->lkj', arrE, arrG)))
+expect_equal(
     as.array(einsum::einsum('ijk,ijkl->lkj', arrE, arrG)),
     as.array(einsum('ijk,ijkl->lkj', darrE, darrG)))
 
 context("### einsum (sum + multiply + transpose, three tensor) ###\n")
-expect_equal(tmp114,
+expect_equal(
+    tmp114,
+    as.vector(einsum::einsum('i,ij,ijk->', arrA, arrD, arrF)))
+expect_equal(
     as.vector(einsum::einsum('i,ij,ijk->', arrA, arrD, arrF)),
     as.vector(einsum('i,ij,ijk->', darrA, darrD, darrF)))
-expect_equal(tmp115,
+expect_equal(
+    tmp115,
+    as.vector(einsum::einsum('i,ij,ijk->i', arrA, arrD, arrF)))
+expect_equal(
     as.vector(einsum::einsum('i,ij,ijk->i', arrA, arrD, arrF)),
     as.vector(einsum('i,ij,ijk->i', darrA, darrD, darrF)))
-expect_equal(tmp116,
+expect_equal(
+    tmp116,
+    as.vector(einsum::einsum('i,ij,ijk->j', arrA, arrD, arrF)))
+expect_equal(
     as.vector(einsum::einsum('i,ij,ijk->j', arrA, arrD, arrF)),
     as.vector(einsum('i,ij,ijk->j', darrA, darrD, darrF)))
-expect_equal(tmp117,
+expect_equal(
+    tmp117,
+    as.vector(einsum::einsum('i,ij,ijk->k', arrA, arrD, arrF)))
+expect_equal(
     as.vector(einsum::einsum('i,ij,ijk->k', arrA, arrD, arrF)),
     as.vector(einsum('i,ij,ijk->k', darrA, darrD, darrF)))
-expect_equal(tmp118,
+expect_equal(
+    tmp118,
+    as.array(einsum::einsum('i,ij,ijk->ij', arrA, arrD, arrF)))
+expect_equal(
     as.array(einsum::einsum('i,ij,ijk->ij', arrA, arrD, arrF)),
     as.array(einsum('i,ij,ijk->ij', darrA, darrD, darrF)))
-expect_equal(tmp119,
+expect_equal(
+    tmp119,
+    as.array(einsum::einsum('i,ij,ijk->ik', arrA, arrD, arrF)))
+expect_equal(
     as.array(einsum::einsum('i,ij,ijk->ik', arrA, arrD, arrF)),
     as.array(einsum('i,ij,ijk->ik', darrA, darrD, darrF)))
-expect_equal(tmp120,
+expect_equal(
+    tmp120,
+    as.array(einsum::einsum('i,ij,ijk->ji', arrA, arrD, arrF)))
+expect_equal(
     as.array(einsum::einsum('i,ij,ijk->ji', arrA, arrD, arrF)),
     as.array(einsum('i,ij,ijk->ji', darrA, darrD, darrF)))
-expect_equal(tmp121,
+expect_equal(
+    tmp121,
+    as.array(einsum::einsum('i,ij,ijk->jk', arrA, arrD, arrF)))
+expect_equal(
     as.array(einsum::einsum('i,ij,ijk->jk', arrA, arrD, arrF)),
     as.array(einsum('i,ij,ijk->jk', darrA, darrD, darrF)))
-expect_equal(tmp122,
+expect_equal(
+    tmp122,
+    as.array(einsum::einsum('i,ij,ijk->ki', arrA, arrD, arrF)))
+expect_equal(
     as.array(einsum::einsum('i,ij,ijk->ki', arrA, arrD, arrF)),
     as.array(einsum('i,ij,ijk->ki', darrA, darrD, darrF)))
-expect_equal(tmp123,
+expect_equal(
+    tmp123,
+    as.array(einsum::einsum('i,ij,ijk->kj', arrA, arrD, arrF)))
+expect_equal(
     as.array(einsum::einsum('i,ij,ijk->kj', arrA, arrD, arrF)),
     as.array(einsum('i,ij,ijk->kj', darrA, darrD, darrF)))
-expect_equal(tmp124,
+expect_equal(
+    tmp124,
+    as.array(einsum::einsum('i,ij,ijk->ijk', arrA, arrD, arrF)))
+expect_equal(
     as.array(einsum::einsum('i,ij,ijk->ijk', arrA, arrD, arrF)),
     as.array(einsum('i,ij,ijk->ijk', darrA, darrD, darrF)))
 
 expect_equal(
     tmp125,
+    einsum::einsum('i,ij,ijk,ijkl->ijkl', arrA, arrD, arrF, arrH))
+expect_equal(
     einsum::einsum('i,ij,ijk,ijkl->ijkl', arrA, arrD, arrF, arrH),
     as.array(einsum('i,ij,ijk,ijkl->ijkl', darrA, darrD, darrF, darrH)))
 

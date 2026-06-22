@@ -20,3 +20,16 @@ setVerbose <- function(as.verbose=FALSE){
 getVerbose <- function(){
     options("delayedtensor.verbose")
 }
+
+setBackend <- function(backend=c("HDF5Array", "TileDBArray")){
+    backend <- match.arg(backend)
+    options(delayedtensor.backend = backend)
+    if(backend == "HDF5Array"){
+        setAutoRealizationBackend("HDF5Array")
+    }
+    message(paste0("DelayedTensor backend set to: ", backend))
+}
+
+getBackend <- function(){
+    getOption("delayedtensor.backend", default="HDF5Array")
+}

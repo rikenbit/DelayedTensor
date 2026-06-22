@@ -1,12 +1,47 @@
-.array <- function(dim){
-    dim <- as.integer(dim)
-    setAutoRealizationBackend("HDF5Array")
-    sink <- AutoRealizationSink(dim)
-    close(sink)
-    as(sink, "DelayedArray")
+# Convert SVT_SparseArray to COO_SparseArray for @nzdata/@nzcoo access
+.as_coo <- function(x) {
+    if (is(x, "COO_SparseArray")) x else as(x, "COO_SparseArray")
 }
 
-# for fold, unfold, and modebind_list
+.array <- function(dim){
+    dim <- as.integer(dim)
+    sink <- .create_sink(dim)
+    close(sink)
+    .sink_to_delayed(sink)
+}
+
+# Direct reshape: read all blocks from source into a flat vector,
+# then reshape to new_modes in one step.
+# Avoids the intermediate vec() HDF5 round-trip.
+.reshapeDirect <- function(darr, new_modes){
+    block.size <- getAutoBlockSize()
+    modes <- dim(darr)
+    new_modes <- as.integer(new_modes)
+    stopifnot(prod(new_modes) == prod(modes))
+    # Grid over source array
+    src_spacings <- .blockSizeScheduling(modes, block.size)
+    src_grid <- RegularArrayGrid(refdim=modes, spacings=src_spacings)
+    # Read all blocks, flatten, concatenate
+    chunks <- vector("list", length(src_grid))
+    for(bid in seq_along(src_grid)){
+        if(options()$delayedtensor.sparse){
+            blk <- as.array(read_block(darr, src_grid[[bid]], as.sparse=TRUE))
+        }else{
+            blk <- read_block(darr, src_grid[[bid]], as.sparse=FALSE)
+        }
+        chunks[[bid]] <- as.vector(blk)
+        if(options()$delayedtensor.verbose){
+            cat(paste0("\\ Reading block ",
+                bid, "/", length(src_grid), " ... OK\n"))
+        }
+    }
+    flat <- unlist(chunks)
+    dim(flat) <- new_modes
+    # Write to HDF5-backed DelayedArray
+    .realize_and_return(DelayedArray(flat))
+}
+
+# for fold, unfold, and modebind_list (legacy, kept for compatibility)
 .reshapeIncNumbers1D <- function(vecobj, new_modes){
     # Setting
     block.size <- getAutoBlockSize()
@@ -30,8 +65,7 @@
     .checkLimit(vec_grid, block.size)
     stopifnot(identical(length(sink_grid), length(vec_grid)))
     # Block processing
-    setAutoRealizationBackend("HDF5Array")
-    sink <- AutoRealizationSink(new_modes)
+    sink <- .create_sink(new_modes)
     FUN <- function(sink_viewport, sink) {
         bid <- currentBlockId()
         block <- .block_reshape(vecobj, vec_grid, bid, sink_viewport)
@@ -40,17 +74,15 @@
     sink <- gridReduce(FUN, sink_grid, sink,
         verbose=options()$delayedtensor.verbose)
     close(sink)
-    as(sink, "DelayedArray")
+    .sink_to_delayed(sink)
 }
 
 .block_reshape <- function(vecobj, vec_grid, bid, sink_viewport){
     dim_sink_viewport <- as.integer(dim(sink_viewport))
     if(options()$delayedtensor.sparse){
-        v <- read_block(vecobj, vec_grid[[bid]], as.sparse=TRUE)
-        out <- COO_SparseArray(dim_sink_viewport)
-        out@nzdata <- v@nzdata
-        out@nzcoo <- Lindex2Mindex(v@nzcoo[,1], dim_sink_viewport)
-        as.array(out)
+        v <- as.array(read_block(vecobj, vec_grid[[bid]], as.sparse=TRUE))
+        dim(v) <- dim_sink_viewport
+        v
     }else{
         v <- read_block(vecobj, vec_grid[[bid]], as.sparse=FALSE)
         dim(v) <- dim_sink_viewport
@@ -388,5 +420,68 @@
 }
 
 .realize_and_return <- function(x){
-    as(realize(x, "HDF5Array"), "DelayedArray")
+    backend <- getBackend()
+    if(backend == "TileDBArray"){
+        .writeTileDB_safe(x)
+    }else{
+        realize(x, "HDF5Array")
+    }
+}
+
+# Workaround for TileDB-R [<- bug (TileDB-Inc/TileDB-R#877):
+# writeTileDBArray() fails for 1D, 2D ncol=1 (silent NaN), and 2D ncol=3
+# (misinterpreted as sparse triplets). 3D+ and 2D ncol=2,4+ work fine.
+# Strategy: pad to a safe ncol, write, then subset back.
+.writeTileDB_safe <- function(x){
+    orig_dim <- dim(x)
+    ndim <- length(orig_dim)
+    needs_pad <- FALSE
+    if(ndim == 1L){
+        # 1D -> 2D ncol=2 with dummy column
+        x <- as.array(x)
+        x <- matrix(c(as.vector(x), rep(0, orig_dim[1])), ncol=2L)
+        needs_pad <- TRUE
+    }else if(ndim == 2L && orig_dim[2] %in% c(1L, 3L)){
+        # Pad to ncol+1 (ncol=1->2, ncol=3->4)
+        x <- as.array(x)
+        x <- cbind(x, matrix(0, nrow=orig_dim[1], ncol=1L))
+        needs_pad <- TRUE
+    }
+    out <- TileDBArray::writeTileDBArray(x, sparse=is_sparse(x))
+    if(needs_pad){
+        if(length(orig_dim) == 1L){
+            # Subset drops to vector; wrap back as 1D DelayedArray
+            v <- as.vector(out[, 1L])
+            dim(v) <- orig_dim
+            out <- DelayedArray(v)
+        }else{
+            out <- out[, seq_len(orig_dim[2]), drop=FALSE]
+        }
+    }
+    # Normalize list(NULL,...) dimnames to NULL
+    dn <- dimnames(out)
+    if(!is.null(dn) && all(vapply(dn, is.null, logical(1)))){
+        dimnames(out) <- NULL
+    }
+    out
+}
+
+.create_sink <- function(dim){
+    dim <- as.integer(dim)
+    # Always use HDF5 sink for block processing.
+    # TileDB's [<- is broken for ncol=1 (silent data loss) and ncol=3
+    # (misinterpreted as sparse triplets). See TileDB-Inc/TileDB-R#877.
+    # Conversion to TileDB happens in .sink_to_delayed() after close().
+    setAutoRealizationBackend("HDF5Array")
+    AutoRealizationSink(dim)
+}
+
+
+.sink_to_delayed <- function(sink){
+    out <- as(sink, "DelayedArray")
+    if(getBackend() == "TileDBArray"){
+        # Block processing used HDF5 sink; convert to TileDB now
+        out <- .realize_and_return(out)
+    }
+    out
 }

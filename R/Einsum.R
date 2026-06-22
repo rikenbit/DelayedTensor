@@ -33,8 +33,7 @@ einsum <- function(subscripts, ...){
         .checkLimit(idx_grids, block.size)
         .checkLimit(sink_grid, block.size)
         # Block processing
-        setAutoRealizationBackend("HDF5Array")
-        sink <- AutoRealizationSink(as.vector(new_modes))
+        sink <- .create_sink(as.vector(new_modes))
         for(bid in seq_along(idx_grids)){
             idx <- Lindex2Mindex(bid, dim(idx_grids))
             colnames(idx) <- names(dim(idx_grids))
@@ -49,7 +48,7 @@ einsum <- function(subscripts, ...){
             }
         }
         close(sink)
-        as(sink, "DelayedArray")
+        .sink_to_delayed(sink)
     }
 }
 

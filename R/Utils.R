@@ -439,9 +439,11 @@
     # Determine if padding is needed
     needs_pad <- FALSE
     if(ndim == 1L){
-        # 1D: reshape to 2D ncol=2 with dummy column
-        x <- DelayedArray(array(c(as.vector(x), rep(0, orig_dim[1])),
-            dim=c(orig_dim[1], 2L)))
+        # 1D: lazy reshape to 2D ncol=2 with dummy column
+        dim(x) <- c(orig_dim[1], 1L)
+        pad <- DelayedArray(matrix(0, nrow=orig_dim[1], ncol=1L))
+        x <- arbind(t(x), t(pad))
+        x <- t(x)
         needs_pad <- TRUE
     }else if(ndim == 2L && orig_dim[2] %in% c(1L, 3L)){
         # Pad to ncol+1 via lazy cbind

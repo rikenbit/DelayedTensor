@@ -428,32 +428,35 @@
     }
 }
 
+# Block-by-block copy to TileDB, avoiding full-memory load.
 # Workaround for TileDB-R [<- bug (TileDB-Inc/TileDB-R#877):
-# writeTileDBArray() fails for 1D, 2D ncol=1 (silent NaN), and 2D ncol=3
-# (misinterpreted as sparse triplets). 3D+ and 2D ncol=2,4+ work fine.
-# Strategy: pad to a safe ncol, write, then subset back.
+# write_block on TileDBRealizationSink fails for 2D ncol=1 (silent NaN)
+# and 2D ncol=3 (misinterpreted as sparse triplets).
+# 3D+ and 2D ncol=2,4+ work fine with block copy.
 .writeTileDB_safe <- function(x){
     orig_dim <- dim(x)
     ndim <- length(orig_dim)
+    # Determine if padding is needed
     needs_pad <- FALSE
     if(ndim == 1L){
-        # 1D -> 2D ncol=2 with dummy column
-        x <- as.array(x)
-        x <- matrix(c(as.vector(x), rep(0, orig_dim[1])), ncol=2L)
+        # 1D: reshape to 2D ncol=2 with dummy column
+        x <- DelayedArray(array(c(as.vector(x), rep(0, orig_dim[1])),
+            dim=c(orig_dim[1], 2L)))
         needs_pad <- TRUE
     }else if(ndim == 2L && orig_dim[2] %in% c(1L, 3L)){
-        # Pad to ncol+1 (ncol=1->2, ncol=3->4)
-        x <- as.array(x)
-        x <- cbind(x, matrix(0, nrow=orig_dim[1], ncol=1L))
+        # Pad to ncol+1 via lazy cbind
+        pad <- DelayedArray(matrix(0, nrow=orig_dim[1], ncol=1L))
+        x <- arbind(t(x), t(pad))
+        x <- t(x)
         needs_pad <- TRUE
     }
-    out <- TileDBArray::writeTileDBArray(x, sparse=is_sparse(x))
+    # Block-by-block copy to TileDB sink
+    out <- .blockCopyToTileDB(x)
     if(needs_pad){
-        if(length(orig_dim) == 1L){
-            # Subset drops to vector; wrap back as 1D DelayedArray
-            v <- as.vector(out[, 1L])
-            dim(v) <- orig_dim
-            out <- DelayedArray(v)
+        if(ndim == 1L){
+            out <- out[, 1L, drop=TRUE]
+            dim(out) <- orig_dim
+            out <- DelayedArray(out)
         }else{
             out <- out[, seq_len(orig_dim[2]), drop=FALSE]
         }
@@ -464,6 +467,26 @@
         dimnames(out) <- NULL
     }
     out
+}
+
+# Copy a DelayedArray to TileDB block by block (never loads full array)
+.blockCopyToTileDB <- function(darr){
+    block.size <- getAutoBlockSize()
+    modes <- dim(darr)
+    spacings <- .blockSizeScheduling(modes, block.size)
+    grid <- RegularArrayGrid(refdim=modes, spacings=spacings)
+    sink <- TileDBArray::TileDBRealizationSink(modes)
+    for(bid in seq_along(grid)){
+        viewport <- grid[[bid]]
+        block <- read_block(darr, viewport)
+        sink <- write_block(sink, viewport, block)
+        if(options()$delayedtensor.verbose){
+            cat(paste0("\\ Copying block ",
+                bid, "/", length(grid), " to TileDB ... OK\n"))
+        }
+    }
+    close(sink)
+    as(sink, "DelayedArray")
 }
 
 .create_sink <- function(dim){

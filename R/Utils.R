@@ -439,12 +439,10 @@
     # Determine if padding is needed
     needs_pad <- FALSE
     if(ndim == 1L){
-        # 1D: lazy reshape to 2D ncol=2 with dummy column
-        dim(x) <- c(orig_dim[1], 1L)
-        pad <- DelayedArray(matrix(0, nrow=orig_dim[1], ncol=1L))
-        x <- arbind(t(x), t(pad))
-        x <- t(x)
-        needs_pad <- TRUE
+        # 1D: TileDB [<- is broken for 1D and 2D ncol=1.
+        # Padding + block copy is too expensive for large arrays.
+        # Keep HDF5-backed result as-is (still a DelayedArray).
+        return(x)
     }else if(ndim == 2L && orig_dim[2] %in% c(1L, 3L)){
         # Pad to ncol+1 via lazy cbind
         pad <- DelayedArray(matrix(0, nrow=orig_dim[1], ncol=1L))

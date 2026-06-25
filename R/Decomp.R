@@ -64,15 +64,15 @@ setMethod("cp", signature(darr="DelayedArray"),
     converged <- FALSE
     fnorm_resid <- rep(0, max_iter)
     pb <- txtProgressBar(min=0, max=max_iter, style=3)
-    while((curr_iter < max_iter) && (!converged)){
+    while((curr_iter <= max_iter) && (!converged)){
         setTxtProgressBar(pb, curr_iter)
         for(m in seq_len(num_modes)){
             V_inv <- solve(hadamard_list(lapply(U_list[-m], function(x){
-                    t(x) %*% x})))
+                    DelayedArray(t(x) %*% x)})))
             tmp <- as(khatri_rao_list(U_list[-m],reverse=TRUE), "DelayedMatrix")
             tmp2 <- unfolded_mat[[m]] %*% tmp %*% V_inv
             lambdas <- colSums(abs(tmp2))
-            U_list[[m]] <- sweep(tmp2, 2, lambdas, "/")
+            U_list[[m]] <- DelayedArray(sweep(tmp2, 2, lambdas, "/"))
             Z <- DelayedDiagonalArray(
                 rep(num_components, length=num_modes), lambdas)
             est <- ttl(Z, U_list, ms=seq_len(num_modes))
@@ -136,7 +136,7 @@ setMethod("tucker", signature(darr="DelayedArray"),
     fnorm_resid <- rep(0, max_iter)
     pb <- txtProgressBar(min=0, max=max_iter, style=3)
     #main loop (until convergence or max_iter)
-    while((curr_iter < max_iter) && (!converged)){
+    while((curr_iter <= max_iter) && (!converged)){
         setTxtProgressBar(pb, curr_iter)
         modes <- .ndim(darr)
         modes_seq <- seq_len(num_modes)

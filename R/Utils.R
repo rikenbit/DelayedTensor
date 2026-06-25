@@ -430,36 +430,37 @@
 
 # Block-by-block copy to TileDB, avoiding full-memory load.
 # Workaround for TileDB-R [<- bug (TileDB-Inc/TileDB-R#877):
-# write_block on TileDBRealizationSink fails for 2D ncol=1 (silent NaN)
-# and 2D ncol=3 (misinterpreted as sparse triplets).
-# 3D+ and 2D ncol=2,4+ work fine with block copy.
+# TileDB [<- misinterprets data when dim[2] is 1 (silent NaN) or 3
+# (treated as sparse triplets). This affects any dimensionality, not
+# just 2D — the bug triggers on the second dimension of the block.
 .writeTileDB_safe <- function(x){
     orig_dim <- dim(x)
     ndim <- length(orig_dim)
-    # Determine if padding is needed
-    needs_pad <- FALSE
     if(ndim == 1L){
-        # 1D: TileDB [<- is broken for 1D and 2D ncol=1.
-        # Padding + block copy is too expensive for large arrays.
+        # 1D: TileDB [<- is broken for 1D.
         # Keep HDF5-backed result as-is (still a DelayedArray).
         return(x)
-    }else if(ndim == 2L && orig_dim[2] %in% c(1L, 3L)){
-        # Pad to ncol+1 via lazy cbind
-        pad <- DelayedArray(matrix(0, nrow=orig_dim[1], ncol=1L))
-        x <- arbind(t(x), t(pad))
-        x <- t(x)
-        needs_pad <- TRUE
+    }
+    # Pad dim[2] if it's 1 or 3 (broken by TileDB [<- bug)
+    needs_pad <- ndim >= 2L && orig_dim[2] %in% c(1L, 3L)
+    if(needs_pad){
+        # Create padding array: same shape but dim[2]=1, filled with 0
+        pad_dim <- orig_dim
+        pad_dim[2] <- 1L
+        pad <- DelayedArray(array(0, dim=pad_dim))
+        # Bind along dim 2
+        x <- arbind(aperm(x, c(2, 1, seq_len(ndim)[-c(1,2)])),
+                     aperm(pad, c(2, 1, seq_len(ndim)[-c(1,2)])))
+        # Restore original dimension order
+        x <- aperm(x, c(2, 1, seq_len(ndim)[-c(1,2)]))
     }
     # Block-by-block copy to TileDB sink
     out <- .blockCopyToTileDB(x)
     if(needs_pad){
-        if(ndim == 1L){
-            out <- out[, 1L, drop=TRUE]
-            dim(out) <- orig_dim
-            out <- DelayedArray(out)
-        }else{
-            out <- out[, seq_len(orig_dim[2]), drop=FALSE]
-        }
+        # Subset to remove padding along dim 2
+        idx <- rep(list(quote(expr=)), ndim)
+        idx[[2]] <- seq_len(orig_dim[2])
+        out <- do.call(`[`, c(list(out), idx, list(drop=FALSE)))
     }
     # Normalize list(NULL,...) dimnames to NULL
     dn <- dimnames(out)
